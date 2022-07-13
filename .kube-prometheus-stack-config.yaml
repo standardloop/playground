@@ -1,0 +1,21 @@
+---
+grafana:
+  ini:
+    server:
+      domain: grafana.local
+      root_url: "http://grafana.local"
+      serve_from_sub_path: true
+      enforce_domain: false
+      enable_gzip: true
+      router_logging: true
+  enabled: true
+  namespaceOverride: "kube-prometheus-stack"
+  defaultDashboardsEnabled: true
+  adminPassword: prom-operator
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    #annotations:
+    hosts: 
+      - grafana.local
+    path: /

@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base
+
+namespace: api-ns
+
+patches:
+  - path: svc-patch.yaml
+    target:
+      kind: Service
+      version: v1
+      name: api-svc
+  # - path: hpa-patch.yaml
+  #   target:
+  #     kind: HorizontalPodAutoscaler
+  #     version: autoscaling/v1
+  #     name: api-hpa
+  - path: dep-patch.yaml
+    target:
+      kind: Deployment
+      version: apps/v1
+      name: api
+
+patchesStrategicMerge:
+- dep-patch.yaml
+
+images:
+  - name: api
+    newTag: 0.0.1
