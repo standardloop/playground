@@ -2,6 +2,8 @@ include Makefile.properties
 
 all: cluster infra app
 
+setup: cluster infra
+
 #clean:  app.clean infra.clean cluster.clean
 clean: cluster.clean
 
@@ -31,7 +33,7 @@ cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
 
-infra: infra.ingress infra.prometheus
+infra: infra.ingress infra.prometheus infra.argocd
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -72,6 +74,19 @@ infra.prometheus.clean:
 	kubectl delete crd prometheusrules.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 	kubectl delete crd servicemonitors.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 	kubectl delete crd thanosrulers.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
+
+infra.argocd:
+	kubectl apply -k deploy/argocd/dev
+
+infra.argocd.password:
+	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+infra.argocd.clean:
+	kubectl delete -k deploy/argocd/dev
+
+infra.fleet:
+	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz
+	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
 
 
 app: api
