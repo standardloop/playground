@@ -20,6 +20,7 @@ controller:
     enabled: false
   extraArgs:
     publish-status-address: "localhost"
+    enable-ssl-passthrough: "true"
   metrics:
     enabled: true
     service:
