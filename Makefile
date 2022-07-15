@@ -64,6 +64,9 @@ infra.prometheus:
 infra.prometheus.upgrade:
 	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./.kube-prometheus-stack-config.yaml --version 36.6.0
 
+infra.prometheus.password:
+	@echo "prom-operator"
+
 infra.prometheus.clean:
 	helm uninstall kube-prometheus-stack 
 	kubectl delete crd alertmanagerconfigs.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)

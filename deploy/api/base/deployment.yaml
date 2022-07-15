@@ -19,6 +19,13 @@ spec:
       containers:
         - name: api
           image: api:0.0.1
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
           ports:
             - name: http-api
               containerPort: 8080
