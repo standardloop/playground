@@ -1,6 +1,6 @@
 include Makefile.properties
 
-all: cluster infra app
+all: check cluster infra app
 
 setup: cluster infra
 
@@ -33,7 +33,7 @@ cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
 
-infra: infra.ingress infra.prometheus infra.argocd infra.metrics:
+infra: infra.ingress infra.prometheus infra.argocd infra.metrics
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
