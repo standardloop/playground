@@ -19,3 +19,15 @@ grafana:
     hosts: 
       - grafana.local
     path: /
+
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    #annotations:
+    hosts:
+      - prometheus.local
+    path: /
+  serviceMonitorSelector:
+    matchLabels:
+      app: api
