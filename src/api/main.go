@@ -36,5 +36,6 @@ func main() {
 	m.Use(r)
 
 	r.GET("/api/v1/health", healthCheck)
+	r.GET("/api/v1/rand", randomNumber)
 	r.Run()
 }

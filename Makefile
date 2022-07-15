@@ -1,6 +1,6 @@
 include Makefile.properties
 
-all: cluster infra app
+all: check cluster infra app
 
 setup: cluster infra
 
@@ -33,7 +33,7 @@ cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
 
-infra: infra.ingress infra.prometheus infra.argocd
+infra: infra.ingress infra.prometheus infra.argocd infra.metrics
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -84,6 +84,10 @@ infra.argocd.password:
 infra.argocd.clean:
 	kubectl delete -k deploy/argocd/dev
 
+infra.metrics:
+	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./.metric-server-config.yaml
+
 infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
@@ -104,5 +108,9 @@ api.deploy:
 api.uninstall:
 	kubectl delete -k deploy/api/dev
 
-api.test:
-	curl localhost:80/api/v1/health | jq
+api.test.basic:
+	curl http://localhost:80/api/v1/health | jq
+
+api.test.rand:
+	curl http://localhost:80/api/v1/rand | jq
+# curl http://localhost:80/api/v1/metrics/

@@ -10,4 +10,4 @@ resources:
   - ksa.yaml
   - servicemonitor.yaml
   - ingress.yaml
-  #- hpa.yaml
+  - hpa.yaml
