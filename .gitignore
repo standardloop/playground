@@ -27,3 +27,4 @@ kbuild.sh
 deploy/api/dev.yaml
 install_argo.sh
 foo.yaml
+src/ui/node_modules
