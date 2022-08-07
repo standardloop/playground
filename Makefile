@@ -96,7 +96,20 @@ infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
 
 
-app: api
+app: api ui
+
+ui: ui.build ui.deploy
+
+ui.build:
+	docker build -t ui:latest -t ui:$(UI_TAG) src/ui
+	kind load docker-image ui:$(UI_TAG) --name $(CLUSTER_NAME)
+
+ui.deploy:
+	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
+	kubectl apply -k deploy/ui/dev
+
+ui.uninstall:
+	kubectl delete -k deploy/ui/dev
 
 api: api.build api.deploy
 
@@ -112,8 +125,8 @@ api.uninstall:
 	kubectl delete -k deploy/api/dev
 
 api.test.basic:
-	curl http://localhost:80/api/v1/health | jq
+	curl https://api.local:80/api/v1/health/ | jq
 
 api.test.rand:
-	curl http://localhost:80/api/v1/rand | jq
+	curl https://api.local:80/api/v1/rand/ | jq
 # curl http://localhost:80/api/v1/metrics/

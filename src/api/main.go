@@ -2,7 +2,9 @@ package main
 
 import (
 	"math/rand"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 )
@@ -27,6 +29,17 @@ func main() {
 
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost"},
+		AllowMethods:     []string{"PUT", "PATCH"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "http://localhost"
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 
 	m := ginmetrics.GetMonitor()
 	m.SetMetricPath(apiVersion + "metrics")
