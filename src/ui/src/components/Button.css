@@ -1,7 +1,7 @@
 .testButton {
-  background-color: #04fd19;
+  background-color: #0c1b46;
   /* border: black; */
-  color: rgb(190, 100, 255);
+  color: rgb(255, 255, 255);
   padding: 100px 300px;
   text-align: center;
   font-size: 100px;
@@ -9,7 +9,7 @@
 }
 
 .testButton:hover {
-  background-color: #04AA6D;
+  background-color: #006aff;
   color: white;
 }
 

@@ -53,7 +53,7 @@ infra.ingress.upgrade:
 	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./.ingress-nginx-config.yaml --version 4.0.6
 
 infra.ingress.clean:
-	helm uninstall ingress-nginx
+	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
 
 infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -96,7 +96,7 @@ infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
 
 
-app: api ui
+app: api #ui
 
 ui: ui.build ui.deploy
 

@@ -29,3 +29,7 @@ spec:
           ports:
             - name: http-ui
               containerPort: 8080
+      volumes:
+        - name: confnginx
+          configMap:
+            name: confnginx
