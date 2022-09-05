@@ -1,6 +1,8 @@
+
+
 import React from 'react';
-import './Button.css';
 import axios from 'axios';
+import '../../styles/Button.module.css'
 
 type MyProps = {};
 type MyState = {randomNumber: string, count: number};
@@ -15,17 +17,17 @@ class Button extends React.Component<MyProps, MyState> {
 
   }
   getNumber = () => {
-    axios.get("/api/v1/rand/", {
+    axios.get(`${process.env.API_PROTOCOOL}://${process.env.API_URL}:${process.env.API_PORT}/api/v1/rand/`, {
     headers: {
-      "accepts": "application/json"
+      "Accepts": "application/json",
     }}).then((response) => {
         const randomNumber = response.data.randomNumber;
         console.log(randomNumber);
         this.setState({randomNumber: randomNumber})
       }).catch(error => {
           console.log(error)
-          this.setState({randomNumber: "API is not online"})
-          alert("API is not online")
+          this.setState({randomNumber: "NULL"})
+          alert(`API at: ${process.env.API_PROTOCOOL}://${process.env.API_URL}:${process.env.API_PORT} is not online`)
       });
   };
   increment = () => {
