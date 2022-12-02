@@ -10,7 +10,7 @@ spec:
   endpoints:
   - interval: 2s
     port: http-api
-    path: /api/v1/metrics/
+    path: /api/v1/metrics
   selector:
     matchLabels:
       app: api

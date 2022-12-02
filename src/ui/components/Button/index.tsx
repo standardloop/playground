@@ -3,6 +3,7 @@
 import React from 'react';
 import axios from 'axios';
 import '../../styles/Button.module.css'
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 
 type MyProps = {};
 type MyState = {randomNumber: string, count: number};

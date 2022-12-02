@@ -9,4 +9,4 @@ namespace: ui
 
 images:
 - name: ui
-  newTag: 0.0.1
+  newTag: 0.0.2

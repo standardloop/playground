@@ -28,18 +28,22 @@ const (
 func main() {
 
 	gin.SetMode(gin.DebugMode)
-	r := gin.Default()
-	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "PUT", "PATCH"},
-		AllowHeaders:     []string{"Accepts"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost"
-		},
-		MaxAge: 12 * time.Hour,
-	}))
+	r := gin.New()
+	r.Use(
+		gin.LoggerWithWriter(gin.DefaultWriter, "/api/v1/metrics"),
+		gin.Recovery(),
+		cors.New(cors.Config{
+			AllowOrigins:     []string{"http://localhost:3000", "http://localhost:80", "http://ui.local:80"},
+			AllowMethods:     []string{"GET", "PUT", "PATCH"},
+			AllowHeaders:     []string{"Accepts"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowOriginFunc: func(origin string) bool {
+				return origin == "http://localhost"
+			},
+			MaxAge: 12 * time.Hour,
+		}),
+	)
 
 	m := ginmetrics.GetMonitor()
 	m.SetMetricPath(apiVersion + "metrics")

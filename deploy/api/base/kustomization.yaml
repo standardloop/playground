@@ -9,5 +9,5 @@ resources:
   - service.yaml
   - ksa.yaml
   - servicemonitor.yaml
-  # - ingress.yaml
+  - ingress.yaml
   - hpa.yaml

@@ -16,9 +16,25 @@ spec:
         app: ui
     spec:
       serviceAccountName: ui-ksa
+      # volumes:
+      # - configMap:
+      #     defaultMode: 420
+      #     items:
+      #     - key: .env
+      #       path: .env.local
+      #     name: ui-env-local
+      #   name: ui-env-local
       containers:
         - name: ui
           image: ui:0.0.1
+          # envFrom:
+          #   - configMapRef:
+          #       name: ui-conf
+          # volumeMounts:
+          # - mountPath: /app/.env.local
+          #   name: ui-env-local
+          #   readOnly: true
+          #   subPath: .env.local
           resources:
             requests:
               memory: "64Mi"
@@ -28,8 +44,4 @@ spec:
               cpu: "500m"
           ports:
             - name: http-ui
-              containerPort: 8080
-      volumes:
-        - name: confnginx
-          configMap:
-            name: confnginx
+              containerPort: 3000

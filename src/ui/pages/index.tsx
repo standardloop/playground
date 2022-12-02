@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Button from '../components/Button';
 import styles from '../styles/Home.module.css'
+import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 
 const Home: NextPage = () => {
   return (
