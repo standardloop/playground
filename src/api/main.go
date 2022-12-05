@@ -1,12 +1,18 @@
 package main
 
 import (
+	_ "fmt"
+
 	"math/rand"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
+	_ "github.com/sirupsen/logrus"
+
+	"api/src/constants"
+	"api/src/database"
 )
 
 func healthCheck(c *gin.Context) {
@@ -20,10 +26,6 @@ func randomNumber(c *gin.Context) {
 		"randomNumber": rand.Intn(10 - 0),
 	})
 }
-
-const (
-	apiVersion = "/api/v1/"
-)
 
 func main() {
 
@@ -46,13 +48,15 @@ func main() {
 	)
 
 	m := ginmetrics.GetMonitor()
-	m.SetMetricPath(apiVersion + "metrics")
+	m.SetMetricPath(constants.ApiVersion + "metrics")
 	m.SetSlowTime(10)
 	m.SetDuration([]float64{0.1, 0.3, 1.2, 5, 10})
 
 	m.Use(r)
 
 	r.GET("/api/v1/health/", healthCheck)
+	r.GET("/api/v1/db-health/", database.DBHealthCheck)
 	r.GET("/api/v1/rand/", randomNumber)
+
 	r.Run()
 }
