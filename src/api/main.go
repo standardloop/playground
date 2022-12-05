@@ -47,7 +47,8 @@ func main() {
 		gin.LoggerWithWriter(gin.DefaultWriter, "/api/v1/metrics"),
 		gin.Recovery(),
 		cors.New(cors.Config{
-			AllowOrigins:     []string{"http://localhost:3000", "http://localhost:80", "http://ui.local:80"},
+			//AllowOrigins:     []string{"http://localhost:3000", "http://localhost:80", "http://ui.local:80"},
+			AllowOrigins:     []string{"*"},
 			AllowMethods:     []string{"GET", "PUT", "PATCH"},
 			AllowHeaders:     []string{"Accepts"},
 			ExposeHeaders:    []string{"Content-Length"},

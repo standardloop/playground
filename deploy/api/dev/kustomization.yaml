@@ -9,4 +9,4 @@ namespace: api
 
 images:
 - name: api
-  newTag: 0.0.4
+  newTag: 0.0.6

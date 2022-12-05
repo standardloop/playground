@@ -1,12 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-
 resources:
 - ../base
 
-namespace: ui
-
-images:
-- name: ui
-  newTag: 0.0.3
+namespace: mysql

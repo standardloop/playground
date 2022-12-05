@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"math/rand"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -13,13 +14,13 @@ import (
 var GormDB = dbInit()
 var globalID uint = 0
 
-const (
-	host     = "localhost"
-	port     = "3306"
-	user     = "root"
-	password = "mypassword"
-	dbname   = "playground"
-)
+func getEnv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
+}
 
 type RandNum struct {
 	ID      uint `json:"id" gorm:"primary_key"`
@@ -54,6 +55,14 @@ func DBHealthCheck(c *gin.Context) {
 }
 
 func dbInit() *gorm.DB {
+
+	// secret management later
+	host := getEnv("MYSQL_HOST", "localhost")
+	port := getEnv("MYSQL_PORT", "3306")
+	user := getEnv("MYSQL_USER", "root")
+	password := getEnv("MYSQL_PASSWORD", "mypassword")
+	dbname := getEnv("MYSQL_DBNAME", "playground")
+
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, password, host, port)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
