@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "fmt"
+	"strconv"
 
 	"math/rand"
 	"time"
@@ -9,7 +10,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
-	_ "github.com/sirupsen/logrus"
 
 	"api/src/constants"
 	"api/src/database"
@@ -27,8 +27,20 @@ func randomNumber(c *gin.Context) {
 	})
 }
 
-func main() {
+func randomNumberFromDB(c *gin.Context) {
 
+	//test := database.GormDB.Exec("SELECT rand_num FROM rand_nums ORDER BY RAND() LIMIT 1;")
+	var randNum database.RandNum
+	randID := strconv.Itoa(rand.Intn(99 - 0))
+	database.GormDB.First(&randNum, "id = ?", randID)
+
+	c.JSON(200, gin.H{
+		"randomNumberFromDB": randNum.RandNum,
+	})
+}
+
+func main() {
+	database.DBSeed()
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
 	r.Use(
@@ -57,6 +69,7 @@ func main() {
 	r.GET("/api/v1/health/", healthCheck)
 	r.GET("/api/v1/db-health/", database.DBHealthCheck)
 	r.GET("/api/v1/rand/", randomNumber)
+	r.GET("/api/v1/randDB/", randomNumberFromDB)
 
 	r.Run()
 }

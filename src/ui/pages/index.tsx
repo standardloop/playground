@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import ButtonCounter from '../components/ButtonCounter';
 import ButtonAPI from '../components/ButtonAPI';
+import ButtonAPIDB from '../components/ButtonAPIDB'
 
 
 import styles from '../styles/Home.module.css'
@@ -27,6 +28,10 @@ const Home: NextPage = () => {
         </div>
         <div>
           <ButtonAPI
+          />
+        </div>
+        <div>
+          <ButtonAPIDB
           />
         </div>
       </main>

@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -9,7 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var db = dbInit()
+var GormDB = dbInit()
+var globalID uint = 0
 
 const (
 	host     = "localhost"
@@ -19,11 +21,28 @@ const (
 	dbname   = "playground"
 )
 
+type RandNum struct {
+	ID      uint `json:"id" gorm:"primary_key"`
+	RandNum int  `json:"randNum" gorm:"randNum"`
+}
+
+func DBSeed() {
+	GormDB.Migrator().CreateTable(&RandNum{})
+
+	for i := 1; i < 100; i++ {
+		globalID += 1
+		randNum := &RandNum{
+			ID:      globalID,
+			RandNum: rand.Intn(100 - 0),
+		}
+		GormDB.Create(randNum)
+	}
+}
+
 func DBHealthCheck(c *gin.Context) {
 	// cleanup
-	fullDB, err := db.DB()
-	err = fullDB.Ping()
-	if err != nil {
+	realDB, err := GormDB.DB()
+	if err != nil || realDB.Ping() != nil {
 		c.JSON(500, gin.H{
 			"FAIL": "DB UNPINGABLE",
 		})
