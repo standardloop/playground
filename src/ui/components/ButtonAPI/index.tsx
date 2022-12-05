@@ -2,16 +2,14 @@
 
 import React from 'react';
 import axios from 'axios';
-import '../../styles/Button.module.css'
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
 
 type MyProps = {};
-type MyState = {randomNumber: string, count: number};
+type MyState = { randomNumber: string };
 
-class Button extends React.Component<MyProps, MyState> {
+class ButtonAPI extends React.Component<MyProps, MyState> {
   constructor(props: MyProps) {
     super(props);
-    this.state = { randomNumber: "0", count: 0};
+    this.state = { randomNumber: "0" };
   }
 
   handleFetchError = () => {
@@ -31,23 +29,17 @@ class Button extends React.Component<MyProps, MyState> {
           alert(`API at: ${process.env.API_PROTOCOOL}://${process.env.API_URL}:${process.env.API_PORT} is not online`)
       });
   };
-  increment = () => {
-    this.setState( {count: this.state.count + 1} )
-  }
+
 
   render() {
     const { randomNumber } = this.state;
-    const { count } = this.state;
     return (
       <div className="Button">
-        <h1>playground</h1>
-        <button onClick={this.increment} className="testButton">Counter</button>
-        <h1>{ count }</h1>
-        <button onClick={this.getNumber} className="testButton">RandomNumberAPI</button>
+        <button onClick={this.getNumber} className="buttonAPI">RandomNumberAPI</button>
         <h1>{ randomNumber }</h1>
       </div>
     );
   };
 }
 
-export default Button;
+export default ButtonAPI;

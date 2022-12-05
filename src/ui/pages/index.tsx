@@ -1,9 +1,12 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import Button from '../components/Button';
+import ButtonCounter from '../components/ButtonCounter';
+import ButtonAPI from '../components/ButtonAPI';
+
+
 import styles from '../styles/Home.module.css'
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from 'next'
+import buttonStyles from '../styles/ButtonCounter.module.css'
+
 
 const Home: NextPage = () => {
   return (
@@ -16,11 +19,14 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome
+          playground
         </h1>
         <div>
-          <Button 
-          //randomNumber="0"
+          <ButtonCounter
+          />
+        </div>
+        <div>
+          <ButtonAPI
           />
         </div>
       </main>
