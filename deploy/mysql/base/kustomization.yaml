@@ -4,10 +4,8 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - configmap.yaml
+  - pv.yaml
+  - pvc.yaml
   - namespace.yaml
   - service.yaml
-  - ksa.yaml
-  - servicemonitor.yaml
-  - ingress.yaml
-  - hpa.yaml
+  - secret.yaml
