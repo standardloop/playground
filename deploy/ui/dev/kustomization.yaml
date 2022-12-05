@@ -5,8 +5,8 @@ kind: Kustomization
 resources:
 - ../base
 
-namespace: api
+namespace: ui
 
 images:
-- name: api
-  newTag: 0.0.4
+- name: ui
+  newTag: 0.0.2

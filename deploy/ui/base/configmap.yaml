@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-env-local
+  #name: ui-conf
+data:
+  .env: |-
+    API_PROTOCOOL=http
+    API_URL=api-svc.api.svc.cluster.local
+    API_PORT=80
