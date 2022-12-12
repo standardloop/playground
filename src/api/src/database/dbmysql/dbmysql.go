@@ -1,9 +1,9 @@
-package database
+package dbmysql
 
 import (
+	"api/src/util"
 	"fmt"
 	"math/rand"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -14,25 +14,12 @@ import (
 var GormDB = dbInit()
 var globalID uint = 0
 
-func getEnv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return fallback
-	}
-	return value
-}
-
-type RandNum struct {
-	ID      uint `json:"id" gorm:"primary_key"`
-	RandNum int  `json:"randNum" gorm:"randNum"`
-}
-
 func DBSeed() {
-	GormDB.Migrator().CreateTable(&RandNum{})
+	GormDB.Migrator().CreateTable(&util.RandNum{})
 
 	for i := 1; i < 100; i++ {
 		globalID += 1
-		randNum := &RandNum{
+		randNum := &util.RandNum{
 			ID:      globalID,
 			RandNum: rand.Intn(100 - 0),
 		}
@@ -57,11 +44,11 @@ func DBHealthCheck(c *gin.Context) {
 func dbInit() *gorm.DB {
 
 	// secret management later
-	host := getEnv("MYSQL_HOST", "localhost")
-	port := getEnv("MYSQL_PORT", "3306")
-	user := getEnv("MYSQL_USER", "root")
-	password := getEnv("MYSQL_PASSWORD", "mypassword")
-	dbname := getEnv("MYSQL_DBNAME", "playground")
+	host := util.GetEnv("MYSQL_HOST", "localhost")
+	port := util.GetEnv("MYSQL_PORT", "3306")
+	user := util.GetEnv("MYSQL_USER", "root")
+	password := util.GetEnv("MYSQL_PASSWORD", "mypassword")
+	dbname := util.GetEnv("MYSQL_DBNAME", "playground")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, password, host, port)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

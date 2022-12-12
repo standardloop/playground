@@ -9,3 +9,9 @@ data:
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "mypassword"
   MYSQL_DBNAME: "playground"
+  # postgresql
+  POSTGRES_HOST: "postgres.postgres.svc.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: "root"
+  POSTGRES_PASSWORD: "mypassword"
+  POSTGRES_DBNAME: "playground"
