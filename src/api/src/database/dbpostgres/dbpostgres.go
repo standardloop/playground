@@ -51,7 +51,7 @@ func dbInit() *gorm.DB {
 	dbname := util.GetEnv("POSTGRES_DBNAME", "playground")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s sslmode=disable TimeZone=America/Denver", host, user, password, port)
-	log.Error("WHATTUP SUCKAS")
+
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
 		PreferSimpleProtocol: true,
