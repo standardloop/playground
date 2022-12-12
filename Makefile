@@ -96,7 +96,13 @@ infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
 
 
-app: api ui
+app: api ui db
+
+db: db.deploy
+
+db.deploy:
+	kubectl apply -k deploy/mysql/dev
+	kubectl apply -k deploy/postgres/dev
 
 ui: ui.build ui.deploy
 

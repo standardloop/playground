@@ -32,6 +32,12 @@ const Home: NextPage = () => {
         </div>
         <div>
           <ButtonAPIDB
+            route={"randMySQLDB"}
+          />
+        </div>
+        <div>
+          <ButtonAPIDB
+            route={"randPostgresDB"}
           />
         </div>
       </main>

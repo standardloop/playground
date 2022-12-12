@@ -12,7 +12,9 @@ import (
 	"github.com/penglongli/gin-metrics/ginmetrics"
 
 	"api/src/constants"
-	"api/src/database"
+	"api/src/database/dbmysql"
+	"api/src/database/dbpostgres"
+	"api/src/util"
 )
 
 func healthCheck(c *gin.Context) {
@@ -27,12 +29,21 @@ func randomNumber(c *gin.Context) {
 	})
 }
 
-func randomNumberFromDB(c *gin.Context) {
-
+func randomNumberFromMySQLDB(c *gin.Context) {
 	//test := database.GormDB.Exec("SELECT rand_num FROM rand_nums ORDER BY RAND() LIMIT 1;")
-	var randNum database.RandNum
+	var randNum util.RandNum
 	randID := strconv.Itoa(rand.Intn(99 - 0))
-	database.GormDB.First(&randNum, "id = ?", randID)
+	dbmysql.GormDB.First(&randNum, "id = ?", randID)
+
+	c.JSON(200, gin.H{
+		"randomNumberFromDB": randNum.RandNum,
+	})
+}
+
+func randomNumberFromPostgresDB(c *gin.Context) {
+	var randNum util.RandNum
+	randID := strconv.Itoa(rand.Intn(99 - 0))
+	dbpostgres.GormDB.First(&randNum, "id = ?", randID)
 
 	c.JSON(200, gin.H{
 		"randomNumberFromDB": randNum.RandNum,
@@ -40,7 +51,10 @@ func randomNumberFromDB(c *gin.Context) {
 }
 
 func main() {
-	database.DBSeed()
+	// log.SetLevel(log.DebugLevel)
+	dbpostgres.DBSeed()
+	dbmysql.DBSeed()
+
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
 	r.Use(
@@ -68,9 +82,11 @@ func main() {
 	m.Use(r)
 
 	r.GET("/api/v1/health/", healthCheck)
-	r.GET("/api/v1/db-health/", database.DBHealthCheck)
+	r.GET("/api/v1/mysql-health/", dbmysql.DBHealthCheck)
+	r.GET("/api/v1/postgres-health/", dbpostgres.DBHealthCheck)
 	r.GET("/api/v1/rand/", randomNumber)
-	r.GET("/api/v1/randDB/", randomNumberFromDB)
+	r.GET("/api/v1/randMySQLDB/", randomNumberFromMySQLDB)
+	r.GET("/api/v1/randPostgresDB/", randomNumberFromPostgresDB)
 
 	r.Run()
 }
