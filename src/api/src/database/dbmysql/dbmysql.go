@@ -1,6 +1,7 @@
 package dbmysql
 
 import (
+	"api/src/config"
 	"api/src/util"
 	"fmt"
 	"math/rand"
@@ -42,15 +43,11 @@ func DBHealthCheck(c *gin.Context) {
 }
 
 func dbInit() *gorm.DB {
+	if !config.Env.MySQLEnabled {
+		return nil
+	}
 
-	// secret management later
-	host := util.GetEnv("MYSQL_HOST", "localhost")
-	port := util.GetEnv("MYSQL_PORT", "3306")
-	user := util.GetEnv("MYSQL_USER", "root")
-	password := util.GetEnv("MYSQL_PASSWORD", "mypassword")
-	dbname := util.GetEnv("MYSQL_DBNAME", "playground")
-
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, password, host, port)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", config.Env.MySQLUser, config.Env.MySQLPass, config.Env.MySQLHost, config.Env.MySQLPort)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("initial init fail")
@@ -65,7 +62,8 @@ func dbInit() *gorm.DB {
 		log.Fatal("create db fail")
 	}
 
-	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.Env.MySQLUser, config.Env.MySQLPass,
+		config.Env.MySQLHost, config.Env.MySQLPort, config.Env.MySQLDBName)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("full connect fail")

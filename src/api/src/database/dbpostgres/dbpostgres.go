@@ -1,6 +1,7 @@
 package dbpostgres
 
 import (
+	"api/src/config"
 	"api/src/util"
 	"fmt"
 	"math/rand"
@@ -43,14 +44,12 @@ func DBHealthCheck(c *gin.Context) {
 
 func dbInit() *gorm.DB {
 
-	// secret management later
-	host := util.GetEnv("POSTGRES_HOST", "localhost")
-	user := util.GetEnv("POSTGRES_USER", "root")
-	password := util.GetEnv("POSTGRES_PASSWORD", "mypassword")
-	port := util.GetEnv("POSTGRES_PORT", "5432")
-	dbname := util.GetEnv("POSTGRES_DBNAME", "playground")
+	if !config.Env.PostgresEnabled {
+		return nil
+	}
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s sslmode=disable TimeZone=America/Denver", host, user, password, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s port=%s sslmode=disable TimeZone=America/Denver", config.Env.PostgresHost, config.Env.PostgresUser,
+		config.Env.PostgresPass, config.Env.PostgresPort)
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
@@ -62,18 +61,19 @@ func dbInit() *gorm.DB {
 	}
 
 	// do not do this in production
-	dbc := db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s;", dbname))
+	dbc := db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
 		log.Fatal("postgres cleanup db rip")
 	}
 
-	dbc = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", dbname))
+	dbc = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
 		log.Fatal("postgres create db rip")
 	}
 
 	db, err = gorm.Open(postgres.New(postgres.Config{
-		DSN:                  fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Denver", host, user, password, dbname, port),
+		DSN: fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Denver", config.Env.PostgresHost, config.Env.PostgresUser,
+			config.Env.PostgresPass, config.Env.PostgresDBName, config.Env.PostgresPort),
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{})
 
