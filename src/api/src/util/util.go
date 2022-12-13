@@ -4,6 +4,7 @@ import (
 	"os"
 )
 
+// clean this up
 func GetEnv(key, fallback string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {

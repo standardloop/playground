@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 
+	"api/src/config"
 	"api/src/constants"
 	"api/src/database/dbmysql"
 	"api/src/database/dbpostgres"
@@ -51,9 +52,16 @@ func randomNumberFromPostgresDB(c *gin.Context) {
 }
 
 func main() {
+
+	// add actual logger and log setup
 	// log.SetLevel(log.DebugLevel)
-	dbpostgres.DBSeed()
-	dbmysql.DBSeed()
+
+	if config.Env.MySQLEnabled {
+		dbmysql.DBSeed()
+	}
+	if config.Env.PostgresEnabled {
+		dbpostgres.DBSeed()
+	}
 
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
@@ -82,11 +90,16 @@ func main() {
 	m.Use(r)
 
 	r.GET("/api/v1/health/", healthCheck)
-	r.GET("/api/v1/mysql-health/", dbmysql.DBHealthCheck)
-	r.GET("/api/v1/postgres-health/", dbpostgres.DBHealthCheck)
 	r.GET("/api/v1/rand/", randomNumber)
-	r.GET("/api/v1/randMySQLDB/", randomNumberFromMySQLDB)
-	r.GET("/api/v1/randPostgresDB/", randomNumberFromPostgresDB)
+
+	if config.Env.MySQLEnabled {
+		r.GET("/api/v1/randMySQLDB/", randomNumberFromMySQLDB)
+		r.GET("/api/v1/mysql-health/", dbmysql.DBHealthCheck)
+	}
+	if config.Env.PostgresEnabled {
+		r.GET("/api/v1/randPostgresDB/", randomNumberFromPostgresDB)
+		r.GET("/api/v1/postgres-health/", dbpostgres.DBHealthCheck)
+	}
 
 	r.Run()
 }
