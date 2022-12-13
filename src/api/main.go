@@ -53,9 +53,6 @@ func randomNumberFromPostgresDB(c *gin.Context) {
 
 func main() {
 
-	// add actual logger and log setup
-	// log.SetLevel(log.DebugLevel)
-
 	if config.Env.MySQLEnabled {
 		dbmysql.DBSeed()
 	}
@@ -63,7 +60,7 @@ func main() {
 		dbpostgres.DBSeed()
 	}
 
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(config.Env.GinMode)
 	r := gin.New()
 	r.Use(
 		gin.LoggerWithWriter(gin.DefaultWriter, "/api/v1/metrics"),
@@ -101,5 +98,5 @@ func main() {
 		r.GET("/api/v1/postgres-health/", dbpostgres.DBHealthCheck)
 	}
 
-	r.Run()
+	r.Run(config.Env.AppPort)
 }

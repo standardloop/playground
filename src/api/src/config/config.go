@@ -1,13 +1,16 @@
 package config
 
 import (
+	"log" // just for here
+
 	"github.com/caarlos0/env"
-	log "github.com/sirupsen/logrus"
 )
 
 // secret management later
 type config struct {
-	Port int `env:"APPLICATION_PORT" envDefault:"8080"`
+	GinMode  string `env:"GIN_MODE" envDefault:"debug"`
+	AppPort  string `env:"APPLICATION_PORT" envDefault:":8080"`
+	LogLevel string `env:"LOG_LEVEL" envDefault:"trace"`
 
 	MySQLEnabled bool   `env:"MYSQL_ENABLED" envDefault:"false"`
 	MySQLHost    string `env:"MYSQL_HOST" envDefault:"localhost"`
@@ -27,6 +30,7 @@ type config struct {
 func initEnvironment() config {
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
+		// can't use logger here or risk circular import
 		log.Fatal("initEnvironment() fail")
 	}
 	return cfg

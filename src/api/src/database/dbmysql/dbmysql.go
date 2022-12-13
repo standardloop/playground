@@ -2,12 +2,12 @@ package dbmysql
 
 import (
 	"api/src/config"
+	"api/src/logging"
 	"api/src/util"
 	"fmt"
 	"math/rand"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -50,23 +50,23 @@ func dbInit() *gorm.DB {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", config.Env.MySQLUser, config.Env.MySQLPass, config.Env.MySQLHost, config.Env.MySQLPort)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("initial init fail")
+		logging.Fatal("initial init fail")
 	}
 	dbc := db.Exec("SET global general_log = 1;")
 	if dbc.Error != nil {
-		log.Fatal("set log fail")
+		logging.Fatal("set log fail")
 	}
 
 	dbc = db.Exec("CREATE DATABASE IF NOT EXISTS playground")
 	if dbc.Error != nil {
-		log.Fatal("create db fail")
+		logging.Fatal("create db fail")
 	}
 
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.Env.MySQLUser, config.Env.MySQLPass,
 		config.Env.MySQLHost, config.Env.MySQLPort, config.Env.MySQLDBName)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("full connect fail")
+		logging.Fatal("full connect fail")
 	}
 	return db
 }
