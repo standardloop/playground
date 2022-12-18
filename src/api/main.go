@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	_ "fmt"
 	"strconv"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/penglongli/gin-metrics/ginmetrics"
 
 	"api/src/config"
-	"api/src/constants"
 	"api/src/database/dbmysql"
 	"api/src/database/dbpostgres"
 	"api/src/util"
@@ -63,7 +63,7 @@ func main() {
 	gin.SetMode(config.Env.GinMode)
 	r := gin.New()
 	r.Use(
-		gin.LoggerWithWriter(gin.DefaultWriter, "/api/v1/metrics"),
+		gin.LoggerWithWriter(gin.DefaultWriter, fmt.Sprintf("%s/metrics", config.ApiVersion)),
 		gin.Recovery(),
 		cors.New(cors.Config{
 			//AllowOrigins:     []string{"http://localhost:3000", "http://localhost:80", "http://ui.local:80"},
@@ -80,22 +80,22 @@ func main() {
 	)
 
 	m := ginmetrics.GetMonitor()
-	m.SetMetricPath(constants.ApiVersion + "metrics")
+	m.SetMetricPath(config.ApiVersion + "/metrics")
 	m.SetSlowTime(10)
 	m.SetDuration([]float64{0.1, 0.3, 1.2, 5, 10})
 
 	m.Use(r)
 
-	r.GET("/api/v1/health/", healthCheck)
-	r.GET("/api/v1/rand/", randomNumber)
+	r.GET(fmt.Sprintf("%s/health", config.ApiVersion), healthCheck)
+	r.GET(fmt.Sprintf("%s/rand", config.ApiVersion), randomNumber)
 
 	if config.Env.MySQLEnabled {
-		r.GET("/api/v1/randMySQLDB/", randomNumberFromMySQLDB)
-		r.GET("/api/v1/mysql-health/", dbmysql.DBHealthCheck)
+		r.GET(fmt.Sprintf("%s/randMySQLDB", config.ApiVersion), randomNumberFromMySQLDB)
+		r.GET(fmt.Sprintf("%s/mysql-health", config.ApiVersion), dbmysql.DBHealthCheck)
 	}
 	if config.Env.PostgresEnabled {
-		r.GET("/api/v1/randPostgresDB/", randomNumberFromPostgresDB)
-		r.GET("/api/v1/postgres-health/", dbpostgres.DBHealthCheck)
+		r.GET(fmt.Sprintf("%s/randPostgresDB", config.ApiVersion), randomNumberFromPostgresDB)
+		r.GET(fmt.Sprintf("%s/postgres-health", config.ApiVersion), dbpostgres.DBHealthCheck)
 	}
 
 	r.Run(config.Env.AppPort)
