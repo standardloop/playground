@@ -16,7 +16,7 @@ class ButtonAPI extends React.Component<MyProps, MyState> {
 
   }
   getNumber = () => {
-    axios.get(`${process.env.API_PROTOCOOL}://${process.env.API_URL}:${process.env.API_PORT}/api/v1/rand/`, {
+    axios.get(`${process.env.API_PROTOCOOL}://${process.env.API_URL}:${process.env.API_PORT}/api/v1/rand`, {
     headers: {
       "Accepts": "application/json",
     }}).then((response) => {
