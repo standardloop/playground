@@ -1,8 +1,8 @@
 package server
 
 import (
-	"api/src/config"
-	"api/src/controllers"
+	"api/config"
+	"api/controllers"
 	"fmt"
 	"time"
 

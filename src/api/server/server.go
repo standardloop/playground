@@ -1,6 +1,6 @@
 package server
 
-import "api/src/config"
+import "api/config"
 
 func Init() {
 	r := NewRouter()

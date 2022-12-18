@@ -1,10 +1,10 @@
 package main
 
 import (
-	"api/src/config"
-	"api/src/database/dbmysql"
-	"api/src/database/dbpostgres"
-	"api/src/server"
+	"api/config"
+	"api/database/dbmysql"
+	"api/database/dbpostgres"
+	"api/server"
 )
 
 func main() {

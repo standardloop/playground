@@ -1,9 +1,9 @@
 package dbpostgres
 
 import (
-	"api/src/config"
-	"api/src/logging"
-	"api/src/models"
+	"api/config"
+	"api/logging"
+	"api/models"
 	"fmt"
 	"math/rand"
 
