@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"api/src/database/dbmysql"
-	"api/src/database/dbpostgres"
-	"api/src/models"
+	"api/database/dbmysql"
+	"api/database/dbpostgres"
+	"api/models"
 	"math/rand"
 	"net/http"
 	"strconv"

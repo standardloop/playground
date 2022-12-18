@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"api/src/config"
+	"api/config"
 
 	"github.com/sirupsen/logrus"
 )

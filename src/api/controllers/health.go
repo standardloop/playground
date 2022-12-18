@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"api/src/database/dbmysql"
-	"api/src/database/dbpostgres"
+	"api/database/dbmysql"
+	"api/database/dbpostgres"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
