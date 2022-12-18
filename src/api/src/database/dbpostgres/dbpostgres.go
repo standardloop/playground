@@ -3,11 +3,10 @@ package dbpostgres
 import (
 	"api/src/config"
 	"api/src/logging"
-	"api/src/util"
+	"api/src/models"
 	"fmt"
 	"math/rand"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,30 +15,16 @@ var GormDB = dbInit()
 var globalID uint = 0
 
 func DBSeed() {
-	GormDB.Migrator().CreateTable(&util.RandNum{})
+	GormDB.Migrator().CreateTable(&models.RandNum{})
 
 	for i := 1; i < 100; i++ {
 		globalID += 1
-		randNum := &util.RandNum{
+		randNum := &models.RandNum{
 			ID:      globalID,
 			RandNum: rand.Intn(100 - 0),
 		}
 		GormDB.Create(randNum)
 	}
-}
-
-func DBHealthCheck(c *gin.Context) {
-	// cleanup
-	realDB, err := GormDB.DB()
-	if err != nil || realDB.Ping() != nil {
-		c.JSON(500, gin.H{
-			"FAIL": "DB UNPINGABLE",
-		})
-	}
-
-	c.JSON(200, gin.H{
-		"OKAY": "DB HEALTHY",
-	})
 }
 
 func dbInit() *gorm.DB {
