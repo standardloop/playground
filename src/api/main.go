@@ -6,24 +6,22 @@ import (
 	"api/database/dbpostgres"
 	"api/logging"
 	"api/server"
-	"os"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	logging.Trace(logrus.Fields{
-		"foo": "bar",
-	}, "hi")
-	os.Exit(1)
+
+	logging.Init()
+	log.Trace().Msg("Starting main()")
 	if config.Env.MySQLEnabled {
 		dbmysql.DBSeed()
-		//logging.Trace("seeding mysql")
+		log.Debug().Msg("seeding mysql")
 	}
 	if config.Env.PostgresEnabled {
 		dbpostgres.DBSeed()
-		//logging.Trace("seeding postgres")
+		log.Debug().Msg("seeding postgres")
 	}
-	//logging.Trace("init server")
+	log.Debug().Msg("initializing server")
 	server.Init()
 }

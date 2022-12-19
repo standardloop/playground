@@ -2,11 +2,11 @@ package dbpostgres
 
 import (
 	"api/config"
-	"api/logging"
 	"api/models"
 	"fmt"
 	"math/rand"
 
+	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -42,18 +42,18 @@ func dbInit() *gorm.DB {
 	}), &gorm.Config{})
 
 	if err != nil {
-		logging.Fatal(nil, "postgres initial init rip")
+		log.Fatal().Msg("postgres initial init rip")
 	}
 
 	// do not do this in production
 	dbc := db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
-		logging.Fatal(nil, "postgres cleanup db rip")
+		log.Fatal().Msg("postgres cleanup db rip")
 	}
 
 	dbc = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
-		logging.Fatal(nil, "postgres create db rip")
+		log.Fatal().Msg("postgres create db rip")
 	}
 
 	db, err = gorm.Open(postgres.New(postgres.Config{
@@ -63,7 +63,7 @@ func dbInit() *gorm.DB {
 	}), &gorm.Config{})
 
 	if err != nil {
-		logging.Fatal(nil, "postgres connect to db rip")
+		log.Fatal().Msg("postgres connect to db rip")
 	}
 
 	return db
