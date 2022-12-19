@@ -35,23 +35,23 @@ func dbInit() *gorm.DB {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", config.Env.MySQLUser, config.Env.MySQLPass, config.Env.MySQLHost, config.Env.MySQLPort)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		logging.Fatal("initial init fail")
+		logging.Fatal(nil, "initial init fail")
 	}
 	dbc := db.Exec("SET global general_log = 1;")
 	if dbc.Error != nil {
-		logging.Fatal("set log fail")
+		logging.Fatal(nil, "set log fail")
 	}
 
 	dbc = db.Exec("CREATE DATABASE IF NOT EXISTS playground")
 	if dbc.Error != nil {
-		logging.Fatal("create db fail")
+		logging.Fatal(nil, "create db fail")
 	}
 
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.Env.MySQLUser, config.Env.MySQLPass,
 		config.Env.MySQLHost, config.Env.MySQLPort, config.Env.MySQLDBName)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		logging.Fatal("full connect fail")
+		logging.Fatal(nil, "full connect fail")
 	}
 	return db
 }

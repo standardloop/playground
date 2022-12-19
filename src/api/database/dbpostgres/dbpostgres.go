@@ -42,18 +42,18 @@ func dbInit() *gorm.DB {
 	}), &gorm.Config{})
 
 	if err != nil {
-		logging.Fatal("postgres initial init rip")
+		logging.Fatal(nil, "postgres initial init rip")
 	}
 
 	// do not do this in production
 	dbc := db.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
-		logging.Fatal("postgres cleanup db rip")
+		logging.Fatal(nil, "postgres cleanup db rip")
 	}
 
 	dbc = db.Exec(fmt.Sprintf("CREATE DATABASE %s;", config.Env.PostgresDBName))
 	if dbc.Error != nil {
-		logging.Fatal("postgres create db rip")
+		logging.Fatal(nil, "postgres create db rip")
 	}
 
 	db, err = gorm.Open(postgres.New(postgres.Config{
@@ -63,7 +63,7 @@ func dbInit() *gorm.DB {
 	}), &gorm.Config{})
 
 	if err != nil {
-		logging.Fatal("postgres connect to db rip")
+		logging.Fatal(nil, "postgres connect to db rip")
 	}
 
 	return db
