@@ -1,7 +1,7 @@
 package config
 
 import (
-	"log" // just for here
+	"os"
 
 	"github.com/caarlos0/env"
 )
@@ -30,8 +30,7 @@ type config struct {
 func initEnvironment() config {
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
-		// can't use logger here or risk circular import
-		log.Fatal("initEnvironment() fail")
+		os.Exit(1)
 	}
 	return cfg
 }

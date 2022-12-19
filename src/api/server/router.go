@@ -3,13 +3,32 @@ package server
 import (
 	"api/config"
 	"api/controllers"
-	"fmt"
+	"api/middleware"
+	"encoding/json"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/penglongli/gin-metrics/ginmetrics"
 )
+
+func jsonLoggerMiddleware() gin.HandlerFunc {
+	return gin.LoggerWithFormatter(
+		func(params gin.LogFormatterParams) string {
+			log := make(map[string]interface{})
+
+			log["status_code"] = params.StatusCode
+			log["path"] = params.Path
+			log["method"] = params.Method
+			log["start_time"] = params.TimeStamp.Format("2006/01/02 - 15:04:05")
+			log["remote_addr"] = params.ClientIP
+			log["response_time"] = params.Latency.String()
+
+			s, _ := json.Marshal(log)
+			return string(s) + "\n"
+		},
+	)
+}
 
 func NewRouter() *gin.Engine {
 	gin.SetMode(config.Env.GinMode)
@@ -19,7 +38,7 @@ func NewRouter() *gin.Engine {
 	randNum := new(controllers.RandNumController)
 
 	r.Use(
-		gin.LoggerWithWriter(gin.DefaultWriter, fmt.Sprintf("%s/metrics", config.ApiVersion)),
+		// gin.LoggerWithWriter(gin.DefaultWriter, fmt.Sprintf("%s/metrics", config.ApiVersion)),
 		gin.Recovery(),
 		cors.New(cors.Config{
 			//AllowOrigins:     []string{"http://localhost:3000", "http://localhost:80", "http://ui.local:80"},
@@ -33,6 +52,7 @@ func NewRouter() *gin.Engine {
 			},
 			MaxAge: 12 * time.Hour,
 		}),
+		middleware.GinLogger(),
 	)
 	m := ginmetrics.GetMonitor()
 	m.SetMetricPath(config.ApiVersion + "/metrics")
