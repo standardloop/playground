@@ -2,12 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  publicRuntimeConfig: {
-    API_PROTOCOOL: process.env.NEXT_PUBLIC_API_PROTOCOOL,
-    API_EXTERNAL_URL: process.env.NEXT_PUBLIC_API_EXTERNAL_URL,
-    API_INTERNAL_URL: process.env.NEXT_PUBLIC_API_INTENRAL_URL,
-    API_PORT: process.env.NEXT_PUBLIC_API_PORT
-  },
   env: {
     API_PROTOCOOL: process.env.API_PROTOCOOL,
     API_EXTERNAL_URL: process.env.API_EXTERNAL_URL,

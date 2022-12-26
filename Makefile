@@ -114,6 +114,14 @@ ui.deploy:
 	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
 	kubectl apply -k deploy/ui/dev
 
+ui.dockerrun:
+	docker run -p 3000:3000 ui:0.0.8 \
+		-e API_PROTOCOOL='http' \
+		-e API_EXTERNAL_URL='localhost' \
+		-e API_INTERNAL_URL='localhost' \
+		-e API_PORT='8080'
+
+
 ui.uninstall:
 	kubectl delete -k deploy/ui/dev
 
@@ -135,3 +143,7 @@ api.test.basic:
 
 api.test.rand:
 	curl http://api.local:80/api/v1/rand | jq
+
+docker.clean:
+	docker stop $(docker ps -a -q)
+	docker rm $(docker ps -a -q)
