@@ -2,10 +2,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ui-env-local
-  #name: ui-conf
+  name: env-local
 data:
   .env: |-
     API_PROTOCOOL=http
-    API_URL=api-svc.api.svc.cluster.local
+    API_INTERNAL_URL=api-svc.api.svc.cluster.local
+    API_EXTERNAL_URL=api.local
     API_PORT=80
+    NEXT_PUBLIC_API_PROTOCOOL=http
+    NEXT_PUBLIC_API_INTERNAL_URL=api-svc.api.svc.cluster.local
+    NEXT_PUBLIC_API_EXTERNAL_URL=api.local
+    NEXT_PUBLIC_API_PORT=80

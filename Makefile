@@ -33,7 +33,7 @@ cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
 
-infra: infra.ingress infra.prometheus infra.argocd infra.metrics
+infra: infra.ingress infra.prometheus infra.metrics #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -131,7 +131,7 @@ api.uninstall:
 	kubectl delete -k deploy/api/dev
 
 api.test.basic:
-	curl http://api.local:80/api/v1/health/ | jq
+	curl http://api.local:80/api/v1/health | jq
 
 api.test.rand:
-	curl http://api.local:80/api/v1/rand/ | jq
+	curl http://api.local:80/api/v1/rand | jq
