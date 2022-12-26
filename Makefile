@@ -33,7 +33,7 @@ cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
 
-infra: infra.ingress infra.prometheus infra.argocd infra.metrics
+infra: infra.ingress infra.prometheus infra.metrics #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -114,6 +114,14 @@ ui.deploy:
 	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
 	kubectl apply -k deploy/ui/dev
 
+ui.dockerrun:
+	docker run -p 3000:3000 ui:0.0.8 \
+		-e API_PROTOCOOL='http' \
+		-e API_EXTERNAL_URL='localhost' \
+		-e API_INTERNAL_URL='localhost' \
+		-e API_PORT='8080'
+
+
 ui.uninstall:
 	kubectl delete -k deploy/ui/dev
 
@@ -131,7 +139,11 @@ api.uninstall:
 	kubectl delete -k deploy/api/dev
 
 api.test.basic:
-	curl http://api.local:80/api/v1/health/ | jq
+	curl http://api.local:80/api/v1/health | jq
 
 api.test.rand:
-	curl http://api.local:80/api/v1/rand/ | jq
+	curl http://api.local:80/api/v1/rand | jq
+
+docker.clean:
+	docker stop $(docker ps -a -q)
+	docker rm $(docker ps -a -q)
