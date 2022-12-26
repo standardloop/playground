@@ -1,4 +1,4 @@
-.env
-.env.production
-.env.local
-.env.*
+# .env
+# .env.production
+# .env.local
+# .env.*

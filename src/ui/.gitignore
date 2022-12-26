@@ -29,7 +29,7 @@ yarn-error.log*
 #.env*.local
 .env.docker
 
-.env.*
+#.env.*
 
 # vercel
 .vercel
@@ -37,3 +37,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.ignore.k8s
+.ignore.local
