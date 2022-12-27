@@ -7,7 +7,7 @@ COPY --chown=node:node . .
 USER node
 
 RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN yarn build:k8s
 
 EXPOSE 3000
-CMD [ "yarn", "start"]
+CMD [ "yarn", "start:k8s"]

@@ -9,3 +9,9 @@ After connecting to docker
 ```sh
 $ mysql --user=root --password playground-mysql
 ```
+
+Create DB
+```SQL
+CREATE DATABASE IF NOT EXISTS playground;
+SHOW DATABASES;
+```

@@ -1,14 +1,17 @@
 import { GetServerSideProps } from 'next'
 import type { NextPage } from 'next'
 import axios from 'axios';
+import { GetConfig } from '../../config';
 
 type PageProps = {
   randomNumber?: string
 }
 
+const config = GetConfig();
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
 
-  const randomNumberReq = await axios.get(`${process.env.API_PROTOCOOL}://${process.env.API_INTERNAL_URL}:${process.env.API_PORT}/api/v1/rand`, {
+  const randomNumberReq = await axios.get(`${config.API_PROTOCOOL}://${config.API_INTERNAL_URL}:${config.API_PORT}/api/v1/rand`, {
     headers: {
       "Accepts": "application/json",
     }

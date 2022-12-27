@@ -2,10 +2,12 @@
 
 import React from 'react';
 import axios from 'axios';
+import { GetConfig } from '../../config';
 
 type MyProps = {};
 type MyState = { randomNumber: string };
 
+const config = GetConfig();
 class ButtonAPI extends React.Component<MyProps, MyState> {
   constructor(props: MyProps) {
     super(props);
@@ -16,7 +18,7 @@ class ButtonAPI extends React.Component<MyProps, MyState> {
 
   }
   getNumber = () => {
-    axios.get(`${process.env.API_PROTOCOOL}://${process.env.API_EXTERNAL_URL}:${process.env.API_PORT}/api/v1/rand`, {
+    axios.get(`${config.API_PROTOCOOL}://${config.API_EXTERNAL_URL}:${config.API_PORT}/api/v1/rand`, {
       headers: {
         "Accepts": "application/json",
       }
@@ -27,7 +29,7 @@ class ButtonAPI extends React.Component<MyProps, MyState> {
     }).catch(error => {
       console.log(error)
       this.setState({ randomNumber: "NULL" })
-      alert(`API at: ${process.env.API_PROTOCOOL}://${process.env.API_EXTERNAL_URL}:${process.env.API_PORT} is not online`)
+      alert(`API at: ${config.API_PROTOCOOL}://${config.API_EXTERNAL_URL}:${config.API_PORT} is not online`)
     });
   };
 
