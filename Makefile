@@ -21,7 +21,7 @@ check.dependencies:
     done
 
 cluster:
-	kind create cluster --config=./.kind-config.yaml --name $(CLUSTER_NAME)
+	kind create cluster --config=./kind-config.yaml --name $(CLUSTER_NAME)
 
 cluster.clean:
 	kind delete cluster --name $(CLUSTER_NAME)
@@ -43,14 +43,14 @@ infra.ingress:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 	helm repo update
 	-kubectl create namespace $(INGRESS_NAMESPACE)
-	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./.ingress-nginx-config.yaml --version 4.0.6
+	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/ingress-nginx-config.yaml --version 4.0.6
 	kubectl wait --namespace $(INGRESS_NAMESPACE) \
 		--for=condition=ready pod \
 		--selector=app.kubernetes.io/component=controller \
 		--timeout=180s
 
 infra.ingress.upgrade:
-	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./.ingress-nginx-config.yaml --version 4.0.6
+	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/ingress-nginx-config.yaml --version 4.0.6
 
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
@@ -59,10 +59,10 @@ infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update
 	kubectl create namespace kube-prometheus-stack
-	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./.kube-prometheus-stack-config.yaml --version 36.6.0
+	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/kube-prometheus-stack-config.yaml --version 36.6.0
 
 infra.prometheus.upgrade:
-	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./.kube-prometheus-stack-config.yaml --version 36.6.0
+	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/kube-prometheus-stack-config.yaml --version 36.6.0
 
 infra.prometheus.password:
 	@echo "prom-operator"
@@ -89,7 +89,7 @@ infra.argocd.clean:
 
 infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./.metric-server-config.yaml
+	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/metric-server-config.yaml
 
 infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz

@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -21,21 +20,18 @@ var collection *mongo.Collection
 var ctx = context.TODO()
 
 func DBSeed() {
-	collection = MongoClient.Database(config.Env.MongoDBName).Collection("foobar")
-	randNumInt := rand.Intn(100 - 0)
-	randNum := &models.MongoRandNum{
-		ID:        primitive.NewObjectID(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		RandNum:   randNumInt,
-	}
-	err := createRandNum(randNum)
-	if err != nil {
-		log.Error().Msg("rip mongo seed")
-	}
-	randNums, err := getAll()
-	for _, obj := range randNums {
-		log.Debug().Msg(strconv.Itoa(obj.RandNum))
+	collection = MongoClient.Database(config.Env.MongoDBName).Collection("randNum")
+	for i := 1; i < 100; i++ {
+		randNum := &models.MongoRandNum{
+			ID:        primitive.NewObjectID(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			RandNum:   rand.Intn(100 - 0),
+		}
+		err := createRandNum(randNum)
+		if err != nil {
+			log.Error().Msg("rip mongo seed")
+		}
 	}
 }
 
@@ -43,11 +39,12 @@ func createRandNum(randNum *models.MongoRandNum) error {
 	_, err := collection.InsertOne(ctx, randNum)
 	return err
 }
+
 func getAll() ([]*models.MongoRandNum, error) {
 	filter := bson.D{{}}
-	return filterrandNums(filter)
+	return filterRandNums(filter)
 }
-func filterrandNums(filter interface{}) ([]*models.MongoRandNum, error) {
+func filterRandNums(filter interface{}) ([]*models.MongoRandNum, error) {
 	var randNums []*models.MongoRandNum
 	cur, err := collection.Find(ctx, filter)
 	if err != nil {
@@ -72,7 +69,11 @@ func filterrandNums(filter interface{}) ([]*models.MongoRandNum, error) {
 }
 
 func dbInit() *mongo.Client {
-	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s/", config.Env.MongoHost, config.Env.MongoPort))
+	credential := options.Credential{
+		Username: config.Env.MongoUser,
+		Password: config.Env.MongoPass,
+	}
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s/", config.Env.MongoHost, config.Env.MongoPort)).SetAuth(credential)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal().Msg("cannot make client to mongodb")

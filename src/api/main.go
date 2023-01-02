@@ -27,7 +27,7 @@ func main() {
 		log.Debug().Msg("seeding mongo")
 		dbmongo.DBSeed()
 	}
-	log.Fatal().Msg("end early")
+	//log.Fatal().Msg("end early")
 
 	log.Debug().Msg("initializing server")
 	server.Init()
