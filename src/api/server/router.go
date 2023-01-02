@@ -75,6 +75,10 @@ func NewRouter() *gin.Engine {
 			apiVersion.GET("/randPostgresDB", randNum.RandomNumberFromPostgres)
 			apiVersion.GET("/postgres-health", health.PostgresStatus)
 		}
+		if config.Env.MongoEnabled {
+			apiVersion.GET("/randMongoDB", randNum.RandomNumberFromMongo)
+			apiVersion.GET("/mongo-health", health.MongoStatus)
+		}
 	}
 	return r
 }

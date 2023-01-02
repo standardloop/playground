@@ -35,6 +35,32 @@ func DBSeed() {
 	}
 }
 
+func GetOne() ([]*models.MongoRandNum, error) {
+	// db.randNum.aggregate([{ $sample: { size: 1 } }])
+	pipeline := []bson.D{bson.D{{Key: "$sample", Value: bson.D{{Key: "size", Value: 1}}}}}
+	var randNums []*models.MongoRandNum
+	cur, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		log.Error().Msg(err.Error())
+	}
+	for cur.Next(ctx) {
+		var t models.MongoRandNum
+		err := cur.Decode(&t)
+		if err != nil {
+			return randNums, err
+		}
+		randNums = append(randNums, &t)
+	}
+	if err := cur.Err(); err != nil {
+		return randNums, err
+	}
+	cur.Close(ctx)
+	if len(randNums) == 0 {
+		return randNums, mongo.ErrNoDocuments
+	}
+	return randNums, nil
+}
+
 func createRandNum(randNum *models.MongoRandNum) error {
 	_, err := collection.InsertOne(ctx, randNum)
 	return err
@@ -44,6 +70,7 @@ func getAll() ([]*models.MongoRandNum, error) {
 	filter := bson.D{{}}
 	return filterRandNums(filter)
 }
+
 func filterRandNums(filter interface{}) ([]*models.MongoRandNum, error) {
 	var randNums []*models.MongoRandNum
 	cur, err := collection.Find(ctx, filter)

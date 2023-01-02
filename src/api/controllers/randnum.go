@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/database/dbmongo"
 	"api/database/dbmysql"
 	"api/database/dbpostgres"
 	"api/models"
@@ -36,5 +37,18 @@ func (r RandNumController) RandomNumberFromPostgres(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"randomNumberFromDB": randNumModel.RandNum,
+	})
+}
+
+func (r RandNumController) RandomNumberFromMongo(c *gin.Context) {
+
+	randNumList, err := dbmongo.GetOne()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"randomNumberFromDB": "NULL",
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"randomNumberFromDB": randNumList[0].RandNum,
 	})
 }
