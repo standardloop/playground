@@ -7,5 +7,13 @@ $ docker run --name playground-mysql -e MYSQL_ROOT_PASSWORD=mypassword -p 3306:3
 
 After connecting to docker
 ```sh
-$ mysql --user=root --password playground-mysql
+$ mysql --user=root --password playground
+$ SHOW TABLES;
+$ SELECT * FROM rand_nums;
+```
+
+Create DB
+```SQL
+CREATE DATABASE IF NOT EXISTS playground;
+SHOW DATABASES;
 ```

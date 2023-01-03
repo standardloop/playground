@@ -25,6 +25,13 @@ type config struct {
 	PostgresUser    string `env:"POSTGRES_USER" envDefault:"root"`
 	PostgresPass    string `env:"POSTGRES_PASS" envDefault:"mypassword"`
 	PostgresDBName  string `env:"POSTGRES_DBNAME" envDefault:"playground"`
+
+	MongoEnabled bool   `env:"MONGO_ENABLED" envDefault:"false"`
+	MongoHost    string `env:"MONGO_HOST" envDefault:"localhost"`
+	MongoPort    string `env:"MONGO_PORT" envDefault:"27017"`
+	MongoUser    string `env:"MONGO_USER" envDefault:"root"`
+	MongoPass    string `env:"MONGO_PASS" envDefault:"mypassword"`
+	MongoDBName  string `env:"MONGO_DBNAME" envDefault:"playground"`
 }
 
 func initEnvironment() config {

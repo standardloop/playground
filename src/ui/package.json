@@ -3,16 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "ENV_NAME=local next dev",
+    "build:local": "ENV_NAME=local next build",
+    "start:local": "ENV_NAME=local next start",
+    "build:k8s": "ENV_NAME=k8s next build",
+    "start:k8s": "ENV_NAME=k8s next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/styled-components": "^5.1.26",
     "axios": "^0.27.2",
     "next": "12.2.5",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@types/node": "18.7.13",

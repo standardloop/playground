@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/config"
+	"api/database/dbmongo"
 	"api/database/dbmysql"
 	"api/database/dbpostgres"
 	"api/logging"
@@ -15,13 +16,15 @@ func main() {
 	logging.Init()
 	log.Trace().Msg("Starting main()")
 	if config.Env.MySQLEnabled {
-		dbmysql.DBSeed()
-		log.Debug().Msg("seeding mysql")
+		dbmysql.Init()
 	}
 	if config.Env.PostgresEnabled {
-		dbpostgres.DBSeed()
-		log.Debug().Msg("seeding postgres")
+		dbpostgres.Init()
 	}
+	if config.Env.MongoEnabled {
+		dbmongo.Init()
+	}
+
 	log.Debug().Msg("initializing server")
 	server.Init()
 }
