@@ -18,8 +18,7 @@ func (h HealthController) Status(c *gin.Context) {
 }
 
 func (h HealthController) MySQLStatus(c *gin.Context) {
-	gormDB := dbmysql.GetDB()
-	realDB, err := gormDB.DB()
+	realDB, err := dbmysql.GormDB.DB()
 	if err != nil || realDB.Ping() != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"FAIL": "DB UNPINGABLE",
@@ -32,8 +31,7 @@ func (h HealthController) MySQLStatus(c *gin.Context) {
 }
 
 func (h HealthController) PostgresStatus(c *gin.Context) {
-	gormDB := dbpostgres.GetDB()
-	realDB, err := gormDB.DB()
+	realDB, err := dbpostgres.GormDB.DB()
 	if err != nil || realDB.Ping() != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"FAIL": "DB UNPINGABLE",

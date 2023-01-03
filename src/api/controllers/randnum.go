@@ -23,9 +23,7 @@ func (r RandNumController) RandomNumber(c *gin.Context) {
 }
 
 func (r RandNumController) RandomNumberFromMySQL(c *gin.Context) {
-	randID := strconv.Itoa(rand.Intn(99 - 0))
-	gormDB := dbmysql.GetDB()
-	gormDB.First(&randNumModel, "id = ?", randID)
+	dbmysql.GormDB.First(&randNumModel, "id = ?", strconv.Itoa(rand.Intn(99-0)))
 
 	c.JSON(http.StatusOK, gin.H{
 		"randomNumberFromDB": randNumModel.RandNum,
@@ -34,14 +32,14 @@ func (r RandNumController) RandomNumberFromMySQL(c *gin.Context) {
 
 func (r RandNumController) RandomNumberFromPostgres(c *gin.Context) {
 	randID := strconv.Itoa(rand.Intn(99 - 0))
-	gormDB := dbpostgres.GetDB()
-	gormDB.First(&randNumModel, "id = ?", randID)
+	dbpostgres.GormDB.First(&randNumModel, "id = ?", randID)
 
 	c.JSON(http.StatusOK, gin.H{
 		"randomNumberFromDB": randNumModel.RandNum,
 	})
 }
 
+// wip
 func (r RandNumController) RandomNumberFromMongo(c *gin.Context) {
 
 	randNumList, err := dbmongo.GetOne()

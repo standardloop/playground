@@ -149,4 +149,5 @@ docker.clean:
 	docker rm $(docker ps -a -q)
 
 docker.compose:
+	docker compose build
 	docker compose up -d

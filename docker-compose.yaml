@@ -13,6 +13,7 @@ services:
       - 27017:27017
     volumes:
       - ./src/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    # profiles: [ "db" ]
   mysqldb:
     image: mysql:8.0
     container_name: mysqldb
@@ -21,6 +22,7 @@ services:
       MYSQL_ROOT_PASSWORD: mypassword
     ports:
       - 3306:3306
+    # profiles: [ "db" ]
   postgresdb:
     image: postgres:14.4
     container_name: postgresdb
@@ -30,39 +32,40 @@ services:
       POSTGRES_PASSWORD: mypassword
     ports:
       - 5432:5432
-  api:
-    build: src/api/
-    container_name: api
-    restart: always
-    environment:
-      # most defaulted, see src/api/config.go
-      # mysql
-      MYSQL_ENABLED: true
-      MYSQL_HOST: mysqldb
-      # postgres
-      POSTGRES_ENABLED: true
-      POSTGRES_HOST: postgresdb
-      # mongo
-      MONGO_ENABLED: true
-      MONGO_HOST: mongodb
-    ports:
-      - 8080:8080
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:8080/api/v1/health"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    depends_on:
-      - mongodb
-      - mysqldb
-      - postgresdb
-    links:
-      - mongodb
-      - mysqldb
-      - postgresdb
+    # profiles: [ "db" ]
+    # api:
+    #   build: src/api/
+    #   container_name: api
+    #   restart: always
+    #   environment:
+    #     # most defaulted, see src/api/config.go
+    #     # mysql
+    #     MYSQL_ENABLED: "false"
+    #     MYSQL_HOST: mysqldb
+    #     # postgres
+    #     POSTGRES_ENABLED: "false"
+    #     POSTGRES_HOST: postgresdb
+    #     # mongo
+    #     MONGO_ENABLED: "false"
+    #     MONGO_HOST: mongodb
+    #   ports:
+    #     - 8080:8080
+    #   healthcheck:
+    #     test:
+    #       [
+    #         "CMD",
+    #         "curl",
+    #         "-f",
+    #         "http://localhost:8080/api/v1/health"
+    #       ]
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5
+    # depends_on:
+    #   - mongodb
+    #   - mysqldb
+    #   - postgresdb
+    # links:
+    #   - mongodb
+    #   - mysqldb
+    #   - postgresdb
