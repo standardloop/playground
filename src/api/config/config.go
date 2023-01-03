@@ -12,7 +12,7 @@ type config struct {
 	AppPort  string `env:"APPLICATION_PORT" envDefault:":8080"`
 	LogLevel string `env:"LOG_LEVEL" envDefault:"trace"`
 
-	MySQLEnabled bool   `env:"MYSQL_ENABLED" envDefault:"true"`
+	MySQLEnabled bool   `env:"MYSQL_ENABLED" envDefault:"false"`
 	MySQLHost    string `env:"MYSQL_HOST" envDefault:"localhost"`
 	MySQLPort    string `env:"MYSQL_PORT" envDefault:"3306"`
 	MySQLUser    string `env:"MYSQL_USER" envDefault:"root"`
