@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  api:
+    build: src/api/
+    container_name: api
+    restart: always
+    environment:
+      MONGO_ENABLED: true
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_USER: root
+      MONGO_PASS: mypassword
+      MONGO_DBNAME: playground
+    ports:
+      - 8080:8080
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mypassword
+      MONGO_INITDB_DATABASE: playground
+    ports:
+      - 27017:27017
+    volumes:
+      - ./src/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro

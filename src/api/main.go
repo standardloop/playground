@@ -24,8 +24,7 @@ func main() {
 		dbpostgres.DBSeed()
 	}
 	if config.Env.MongoEnabled {
-		log.Debug().Msg("seeding mongo")
-		dbmongo.DBSeed()
+		dbmongo.Init()
 	}
 
 	log.Debug().Msg("initializing server")

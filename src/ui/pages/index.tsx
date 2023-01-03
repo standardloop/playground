@@ -4,10 +4,7 @@ import ButtonCounter from '../components/ButtonCounter';
 import ButtonAPI from '../components/ButtonAPI';
 import ButtonAPIDB from '../components/ButtonAPIDB'
 
-
 import styles from '../styles/Home.module.css'
-import buttonStyles from '../styles/ButtonCounter.module.css'
-
 
 const Home: NextPage = () => {
   return (
@@ -38,6 +35,11 @@ const Home: NextPage = () => {
         <div>
           <ButtonAPIDB
             route={"randPostgresDB"}
+          />
+        </div>
+        <div>
+          <ButtonAPIDB
+            route={"randMongoDB"}
           />
         </div>
       </main>

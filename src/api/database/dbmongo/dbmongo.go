@@ -15,12 +15,31 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var MongoClient = dbInit()
+var mongoClient *mongo.Client
 var collection *mongo.Collection
 var ctx = context.TODO()
 
-func DBSeed() {
-	collection = MongoClient.Database(config.Env.MongoDBName).Collection("randNum")
+func Init() {
+	credential := options.Credential{
+		Username: config.Env.MongoUser,
+		Password: config.Env.MongoPass,
+	}
+	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s/", config.Env.MongoHost, config.Env.MongoPort)).SetAuth(credential)
+	mongoClient, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal().Msg("cannot make client to mongodb")
+	}
+	err = mongoClient.Ping(ctx, nil)
+	if err != nil {
+		log.Error().Msg("Failed to ping mongodb")
+	} else {
+		log.Debug().Msg("succsesfully pinged mongodb")
+	}
+	collection = mongoClient.Database(config.Env.MongoDBName).Collection("randNum")
+	dbSeed()
+}
+
+func dbSeed() {
 	for i := 1; i < 100; i++ {
 		randNum := &models.MongoRandNum{
 			ID:        primitive.NewObjectID(),
@@ -35,8 +54,22 @@ func DBSeed() {
 	}
 }
 
+func createRandNum(randNum *models.MongoRandNum) error {
+	_, err := collection.InsertOne(ctx, randNum)
+	return err
+}
+
+func HealthCheck() error {
+	err := mongoClient.Ping(ctx, nil)
+	if err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+// this function is really only a POC
 func GetOne() ([]*models.MongoRandNum, error) {
-	// db.randNum.aggregate([{ $sample: { size: 1 } }])
 	pipeline := []bson.D{bson.D{{Key: "$sample", Value: bson.D{{Key: "size", Value: 1}}}}}
 	var randNums []*models.MongoRandNum
 	cur, err := collection.Aggregate(ctx, pipeline)
@@ -61,11 +94,7 @@ func GetOne() ([]*models.MongoRandNum, error) {
 	return randNums, nil
 }
 
-func createRandNum(randNum *models.MongoRandNum) error {
-	_, err := collection.InsertOne(ctx, randNum)
-	return err
-}
-
+// not needed right now, but save for later
 func getAll() ([]*models.MongoRandNum, error) {
 	filter := bson.D{{}}
 	return filterRandNums(filter)
@@ -93,23 +122,4 @@ func filterRandNums(filter interface{}) ([]*models.MongoRandNum, error) {
 		return randNums, mongo.ErrNoDocuments
 	}
 	return randNums, nil
-}
-
-func dbInit() *mongo.Client {
-	credential := options.Credential{
-		Username: config.Env.MongoUser,
-		Password: config.Env.MongoPass,
-	}
-	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s/", config.Env.MongoHost, config.Env.MongoPort)).SetAuth(credential)
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Fatal().Msg("cannot make client to mongodb")
-	}
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Error().Msg("Failed to ping mongodb")
-	} else {
-		log.Debug().Msg("succsesfully pinged mongodb")
-	}
-	return client
 }

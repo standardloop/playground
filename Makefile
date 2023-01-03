@@ -147,3 +147,6 @@ api.test.rand:
 docker.clean:
 	docker stop $(docker ps -a -q)
 	docker rm $(docker ps -a -q)
+
+docker.compose:
+	docker compose up -d
