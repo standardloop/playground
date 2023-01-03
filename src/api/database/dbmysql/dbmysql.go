@@ -11,11 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var GormDB = dbInit()
+var gormDB *gorm.DB
 var globalID uint = 0
 
-func DBSeed() {
-	GormDB.Migrator().CreateTable(&models.RandNum{})
+func GetDB() *gorm.DB {
+	return gormDB
+}
+
+func dbSeed() {
+	gormDB.Migrator().CreateTable(&models.RandNum{})
 
 	for i := 1; i < 100; i++ {
 		globalID += 1
@@ -23,35 +27,32 @@ func DBSeed() {
 			ID:      globalID,
 			RandNum: rand.Intn(100 - 0),
 		}
-		GormDB.Create(randNum)
+		gormDB.Create(randNum)
 	}
 }
 
-func dbInit() *gorm.DB {
-	if !config.Env.MySQLEnabled {
-		return nil
-	}
+func Init() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", config.Env.MySQLUser, config.Env.MySQLPass, config.Env.MySQLHost, config.Env.MySQLPort)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Msg("initial init fail")
 	}
-	dbc := db.Exec("SET global general_log = 1;")
+	dbc := gormDB.Exec("SET global general_log = 1;")
 	if dbc.Error != nil {
 		log.Fatal().Msg("set log fail")
 	}
 
-	dbc = db.Exec("CREATE DATABASE IF NOT EXISTS playground")
+	dbc = gormDB.Exec("CREATE DATABASE IF NOT EXISTS playground")
 	if dbc.Error != nil {
 		log.Fatal().Msg("create db fail")
 	}
 
 	dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", config.Env.MySQLUser, config.Env.MySQLPass,
 		config.Env.MySQLHost, config.Env.MySQLPort, config.Env.MySQLDBName)
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	gormDB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal().Msg("full connect fail")
 	}
-	return db
+	dbSeed()
 }

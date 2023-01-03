@@ -6,10 +6,6 @@ $ docker run --name playground-mongo -d -p 27017:27017 -e MONGO_INITDB_ROOT_USER
 ```
 
 ```sh
-$ docker-compose up --build -d mongodb
-```
-
-```sh
 $ mongosh
 $ use playground
 $ db.auth("root", "mypassword")

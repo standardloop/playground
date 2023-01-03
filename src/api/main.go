@@ -16,12 +16,10 @@ func main() {
 	logging.Init()
 	log.Trace().Msg("Starting main()")
 	if config.Env.MySQLEnabled {
-		log.Debug().Msg("seeding mysql")
-		dbmysql.DBSeed()
+		dbmysql.Init()
 	}
 	if config.Env.PostgresEnabled {
-		log.Debug().Msg("seeding postgres")
-		dbpostgres.DBSeed()
+		dbpostgres.Init()
 	}
 	if config.Env.MongoEnabled {
 		dbmongo.Init()
