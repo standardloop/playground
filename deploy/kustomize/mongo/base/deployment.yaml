@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - image: mongo:6.0
+          name: mongo
+          args: ["--dbpath", "/data/db"]
+          envFrom:
+            - configMapRef:
+                name: mongo-cm
+          ports:
+            - containerPort: 27017
+              name: mongo
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+            - name: mongo-initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mongo-persistent-storage
+          persistentVolumeClaim:
+            claimName: mongo-pv-claim
+        - name: mongo-initdb
+          configMap:
+            name: mongo-initdb

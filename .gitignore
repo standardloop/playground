@@ -21,7 +21,6 @@ k8s/server/dev.yaml
 INFO.md
 run.txt
 info.txt
-kustomize/
 argocd/notes.txt
 kbuild.sh
 deploy/api/dev.yaml

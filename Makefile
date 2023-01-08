@@ -43,14 +43,14 @@ infra.ingress:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 	helm repo update
 	-kubectl create namespace $(INGRESS_NAMESPACE)
-	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/ingress-nginx-config.yaml --version 4.0.6
+	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
 	kubectl wait --namespace $(INGRESS_NAMESPACE) \
 		--for=condition=ready pod \
 		--selector=app.kubernetes.io/component=controller \
 		--timeout=180s
 
 infra.ingress.upgrade:
-	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/ingress-nginx-config.yaml --version 4.0.6
+	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
 
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
@@ -59,10 +59,10 @@ infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update
 	kubectl create namespace kube-prometheus-stack
-	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/kube-prometheus-stack-config.yaml --version 36.6.0
+	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/helm/kube-prometheus-stack.yaml --version 36.6.0
 
 infra.prometheus.upgrade:
-	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/kube-prometheus-stack-config.yaml --version 36.6.0
+	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/helm/kube-prometheus-stack.yaml --version 36.6.0
 
 infra.prometheus.password:
 	@echo "prom-operator"
@@ -79,30 +79,30 @@ infra.prometheus.clean:
 	kubectl delete crd thanosrulers.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 
 infra.argocd:
-	kubectl apply -k deploy/argocd/dev
+	kubectl apply -k deploy/kustomize/argocd/dev
 
 infra.argocd.password:
 	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 
 infra.argocd.clean:
-	kubectl delete -k deploy/argocd/dev
+	kubectl delete -k deploy/kustomize/argocd/dev
 
 infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/metric-server-config.yaml
+	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/helm/metric-server.yaml
 
 infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
-
 
 app: api ui db
 
 db: db.deploy
 
 db.deploy:
-	kubectl apply -k deploy/mysql/dev
-	kubectl apply -k deploy/postgres/dev
+	kubectl apply -k deploy/kustomize/mysql/dev
+	kubectl apply -k deploy/kustomize/postgres/dev
+	kubectl apply -k deploy/kustomize/mongo/dev
 
 ui: ui.build ui.deploy
 
@@ -112,7 +112,7 @@ ui.build:
 
 ui.deploy:
 	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
-	kubectl apply -k deploy/ui/dev
+	kubectl apply -k deploy/kustomize/ui/dev
 
 ui.dockerrun:
 	docker run -p 3000:3000 ui:0.0.8 \
@@ -123,7 +123,7 @@ ui.dockerrun:
 
 
 ui.uninstall:
-	kubectl delete -k deploy/ui/dev
+	kubectl delete -k deploy/kustomize/ui/dev
 
 api: api.build api.deploy
 
@@ -132,11 +132,11 @@ api.build:
 	kind load docker-image api:$(API_TAG) --name $(CLUSTER_NAME)
 
 api.deploy:
-	cd deploy/api/dev && kustomize edit set image api:$(API_TAG) 
-	kubectl apply -k deploy/api/dev
+	cd deploy/kustomize/api/dev && kustomize edit set image api:$(API_TAG) 
+	kubectl apply -k deploy/kustomize/api/dev
 
 api.uninstall:
-	kubectl delete -k deploy/api/dev
+	kubectl delete -k deploy/kustomize/api/dev
 
 api.test.basic:
 	curl http://api.local:80/api/v1/health | jq

@@ -4,14 +4,24 @@ kind: ConfigMap
 metadata:
   name: api-cm
 data:
+  # mysql
+  MYSQL_ENABLED: "false"
   MYSQL_HOST: "mysql.mysql.svc.cluster.local"
   MYSQL_PORT: "3306"
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "mypassword"
   MYSQL_DBNAME: "playground"
   # postgresql
+  POSTGRES_ENABLED: "false"
   POSTGRES_HOST: "postgres.postgres.svc.cluster.local"
   POSTGRES_PORT: "5432"
   POSTGRES_USER: "root"
   POSTGRES_PASSWORD: "mypassword"
   POSTGRES_DBNAME: "playground"
+  # mongo
+  MONGO_ENABLED: "true"
+  MONGO_HOST: "mongo.mongo.svc.cluster.local"
+  MONGO_PORT: "27017"
+  MONGO_USER: "root"
+  MONGO_PASS: "mypassword"
+  MONGO_DBNAME: "playground"
