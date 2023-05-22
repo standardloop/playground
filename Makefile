@@ -55,6 +55,15 @@ infra.ingress.upgrade:
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
 
+infra.istio:
+	helm repo add istio https://istio-release.storage.googleapis.com/charts
+	helm repo update
+	-kubectl create namespace istio-system
+	helm install istio-base istio/base -n istio-system
+	helm install intall istiod istio/istiod -n istio-system --wait
+	-kubectl create namespace istio-ingress
+	helm install istio-ingress istio/gateway -n istio-ingress --values ./deploy/helm/istio-ingress.yaml
+
 infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update
