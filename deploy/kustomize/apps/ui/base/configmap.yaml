@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-local
+data:
+  .env: |-
+    API_PROTOCOOL=http
+    API_INTERNAL_URL=api
+    API_EXTERNAL_URL=api.local
+    API_PORT=80
