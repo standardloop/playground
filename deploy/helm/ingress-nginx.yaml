@@ -13,7 +13,7 @@ controller:
   nodeSelector:
     ingress-ready: "true"
   tolerations:
-    - key: "node-role.kubernetes.io/master"
+    - key: "node-role.kubernetes.io/control-plane"
       operator: "Equal"
       effect: "NoSchedule"
   publishService:
