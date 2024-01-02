@@ -1,6 +1,7 @@
 ---
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+name: jke-1
 nodes:
   - role: control-plane
     image: kindest/node:v1.27.3
@@ -10,6 +11,9 @@ nodes:
         nodeRegistration:
           kubeletExtraArgs:
             node-labels: "ingress-ready=true"
+      # - |
+      #   kind: KubeletConfiguration
+      #   cgroupDriver: systemd
     extraPortMappings:
       - containerPort: 80
         hostPort: 80

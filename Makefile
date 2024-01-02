@@ -4,7 +4,9 @@ all: check cluster infra app
 
 setup: cluster infra
 
-#clean:  app.clean infra.clean cluster.clean
+# kubectl config unset current-context
+# clean:  app.clean infra.clean cluster.clean
+
 clean: cluster.clean
 
 check: check.dependencies check.docker
@@ -21,7 +23,7 @@ check.dependencies:
     done
 
 cluster:
-	kind create cluster --config=./kind-config.yaml --name $(CLUSTER_NAME)
+	kind create cluster --config=./kind-config.yaml
 
 cluster.clean:
 	kind delete cluster --name $(CLUSTER_NAME)
@@ -32,7 +34,6 @@ cluster.context:
 cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
-
 infra: infra.ingress infra.prometheus infra.metrics #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
@@ -40,8 +41,8 @@ infra.clean: infra.prometheus.clean infra.ingress.clean
 infra.upgrade: infra.ingress.upgrade infra.prometheus.upgrade
 
 infra.ingress:
-	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-	helm repo update
+	-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+	-helm repo update
 	-kubectl create namespace $(INGRESS_NAMESPACE)
 	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
 	kubectl wait --namespace $(INGRESS_NAMESPACE) \
@@ -55,14 +56,18 @@ infra.ingress.upgrade:
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
 
-infra.istio:
-	helm repo add istio https://istio-release.storage.googleapis.com/charts
-	helm repo update
+infra.istio: infra.istio.base infra.istio.gateway
+
+infra.istio.base:
+	-helm repo add istio https://istio-release.storage.googleapis.com/charts
+	-helm repo update
 	-kubectl create namespace istio-system
 	helm install istio-base istio/base -n istio-system
-	helm install intall istiod istio/istiod -n istio-system --wait
-	-kubectl create namespace istio-ingress
-	helm install istio-ingress istio/gateway -n istio-ingress --values ./deploy/helm/istio-ingress.yaml
+	helm install istiod istio/istiod -n istio-system --wait
+
+infra.istio.gateway:
+	-kubectl create namespace istio-gateway
+	helm install istio-gateway istio/gateway -n istio-gateway --values ./deploy/helm/istio-gateway.yaml
 
 infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -88,13 +93,13 @@ infra.prometheus.clean:
 	kubectl delete crd thanosrulers.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 
 infra.argocd:
-	kubectl apply -k deploy/kustomize/argocd/dev
+	kubectl apply -k deploy/kustomize/apps/argocd/dev
 
 infra.argocd.password:
 	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 
 infra.argocd.clean:
-	kubectl delete -k deploy/kustomize/argocd/dev
+	kubectl delete -k deploy/kustomize/apps/argocd/dev
 
 infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
@@ -109,9 +114,9 @@ app: api ui db
 db: db.deploy
 
 db.deploy:
-	kubectl apply -k deploy/kustomize/mysql/dev
-	kubectl apply -k deploy/kustomize/postgres/dev
-	kubectl apply -k deploy/kustomize/mongo/dev
+	kubectl apply -k deploy/kustomize/apps/mysql/dev
+	kubectl apply -k deploy/kustomize/apps/postgres/dev
+	kubectl apply -k deploy/kustomize/apps/mongo/dev
 
 ui: ui.build ui.deploy
 
@@ -121,7 +126,7 @@ ui.build:
 
 ui.deploy:
 	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
-	kubectl apply -k deploy/kustomize/ui/dev
+	kubectl apply -k deploy/kustomize/apps/ui/dev
 
 ui.dockerrun:
 	docker run -p 3000:3000 ui:0.0.8 \
@@ -132,7 +137,7 @@ ui.dockerrun:
 
 
 ui.uninstall:
-	kubectl delete -k deploy/kustomize/ui/dev
+	kubectl delete -k deploy/kustomize/apps/ui/dev
 
 api: api.build api.deploy
 
@@ -141,11 +146,11 @@ api.build:
 	kind load docker-image api:$(API_TAG) --name $(CLUSTER_NAME)
 
 api.deploy:
-	cd deploy/kustomize/api/dev && kustomize edit set image api:$(API_TAG) 
-	kubectl apply -k deploy/kustomize/api/dev
+	cd deploy/kustomize/apps/api/dev && kustomize edit set image api:$(API_TAG) 
+	kubectl apply -k deploy/kustomize/apps/api/dev
 
 api.uninstall:
-	kubectl delete -k deploy/kustomize/api/dev
+	kubectl delete -k deploy/kustomize/apps/api/dev
 
 api.test.basic:
 	curl http://api.local:80/api/v1/health | jq
