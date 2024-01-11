@@ -8,11 +8,19 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type RandNumController struct{}
+
+func (r RandNumController) RandomNumberWithSleep(c *gin.Context) {
+	time.Sleep(5 * time.Second)
+	c.JSON(200, gin.H{
+		"randomNumber": rand.Intn(10 - 0),
+	})
+}
 
 func (r RandNumController) RandomNumber(c *gin.Context) {
 	c.JSON(200, gin.H{

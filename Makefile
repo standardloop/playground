@@ -34,7 +34,7 @@ cluster.context:
 cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
-infra: infra.ingress infra.prometheus infra.metrics #infra.argocd 
+infra: infra.ingress infra.prometheus infra.metrics infra.istio #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -73,10 +73,10 @@ infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update
 	kubectl create namespace kube-prometheus-stack
-	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/helm/kube-prometheus-stack.yaml --version 36.6.0
+	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n $(PROM_STACK_NAMESPACE) --values ./deploy/helm/kube-prometheus-stack.yaml --version $(PROM_STACK_VERSION)
 
 infra.prometheus.upgrade:
-	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n kube-prometheus-stack --values ./deploy/helm/kube-prometheus-stack.yaml --version 36.6.0
+	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n $(PROM_STACK_NAMESPACE) --values ./deploy/helm/kube-prometheus-stack.yaml --version $(PROM_STACK_VERSION)
 
 infra.prometheus.password:
 	@echo "prom-operator"
@@ -109,7 +109,7 @@ infra.fleet:
 	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz
 	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
 
-app: api ui db
+app: api #ui db
 
 db: db.deploy
 
@@ -165,3 +165,7 @@ docker.clean:
 docker.compose:
 	docker compose build
 	docker compose up -d
+
+
+# gin_request_total
+# istio_request_total

@@ -31,6 +31,10 @@ prometheus:
     hosts:
       - prometheus.local
     path: /
-  serviceMonitorSelector:
-    matchLabels:
-      app: api
+  prometheusSpec:
+    serviceMonitorSelector:
+      matchLabels:
+        release: kube-prometheus-stack
+    podMonitorSelector:
+      matchLabels:
+        release: kube-prometheus-stack
