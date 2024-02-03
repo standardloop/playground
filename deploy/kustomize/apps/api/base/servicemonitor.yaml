@@ -4,13 +4,14 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: api
+    playground-metrics: enabled
     release: kube-prometheus-stack
   name: api-monitor
 spec:
   endpoints:
-  - interval: 2s
-    port: http-api
-    path: /api/v1/metrics
+    - interval: 2s
+      port: http-api
+      path: /api/v1/metrics
   selector:
     matchLabels:
       app: api

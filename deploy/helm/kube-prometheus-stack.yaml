@@ -14,7 +14,7 @@ grafana:
   enabled: true
   namespaceOverride: "kube-prometheus-stack"
   defaultDashboardsEnabled: true
-  adminPassword: prom-operator
+  adminPassword: admin
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -27,10 +27,14 @@ prometheus:
   ingress:
     enabled: true
     ingressClassName: nginx
-    #annotations:
+    # annotations:
     hosts:
       - prometheus.local
     path: /
-  serviceMonitorSelector:
-    matchLabels:
-      app: api
+  prometheusSpec:
+    serviceMonitorSelector:
+      matchLabels:
+        release: kube-prometheus-stack
+    podMonitorSelector:
+      matchLabels:
+        release: kube-prometheus-stack

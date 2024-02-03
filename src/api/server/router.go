@@ -66,6 +66,7 @@ func NewRouter() *gin.Engine {
 
 		apiVersion.GET("/health", health.Status)
 		apiVersion.GET("/rand", randNum.RandomNumber)
+		apiVersion.GET("/rand-sleep", randNum.RandomNumberWithSleep)
 
 		if config.Env.MySQLEnabled {
 			apiVersion.GET("/randMySQLDB", randNum.RandomNumberFromMySQL)

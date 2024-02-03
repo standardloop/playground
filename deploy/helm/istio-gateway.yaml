@@ -1,0 +1,9 @@
+service:
+  type: "ClusterIP"
+# nodeSelector:
+#   ingress-ready: "true"
+
+# tolerations:
+#   - key: "node-role.kubernetes.io/control-plane"
+#     operator: "Equal"
+#     effect: "NoSchedule"
