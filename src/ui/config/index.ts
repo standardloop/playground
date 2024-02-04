@@ -1,12 +1,10 @@
 import ENV_LOCAL from "./env.local.json";
 import ENV_K8S from "./env.k8s.json";
-import ENV_FOO from "./env.foo.json";
 
 const isServer = typeof window === "undefined";
 
 const EnvConfig = {
     local: ENV_LOCAL,
-    foo: ENV_FOO,
     k8s: ENV_K8S
 };
 
@@ -25,6 +23,7 @@ export const GetEnv = () => {
 }
 
 export const GetConfig = () => {
+    console.log("scooby doo");
     const env = GetEnv();
     const config = {
         ...EnvConfig[env || "local"]
