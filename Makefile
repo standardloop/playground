@@ -34,11 +34,17 @@ cluster.context:
 cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
-infra: infra.ingress infra.prometheus infra.metrics infra.istio #infra.argocd 
+infra: infra.ingress infra.prometheus infra.metrics #infra.istio #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
 infra.upgrade: infra.ingress.upgrade infra.prometheus.upgrade
+
+infra.redis:
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	helm repo update
+	kubectl create namespace redis
+	helm install my-redis bitnami/redis -n redis
 
 infra.ingress:
 	-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -105,11 +111,7 @@ infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/helm/metric-server.yaml
 
-infra.fleet:
-	helm -n fleet-system install --create-namespace --wait fleet-crd https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-crd-$(FLEET_VERSION).tgz
-	helm -n fleet-system install --create-namespace --wait fleet https://github.com/rancher/fleet/releases/download/v$(FLEET_VERSION)/fleet-$(FLEET_VERSION).tgz
-
-app: api #ui db
+app: api ui db
 
 db: db.deploy
 
@@ -125,7 +127,7 @@ ui.build:
 	kind load docker-image ui:$(UI_TAG) --name $(CLUSTER_NAME)
 
 ui.deploy:
-	cd deploy/ui/dev && kustomize edit set image ui:$(UI_TAG) 
+	cd deploy/kustomize/apps/ui/dev && kustomize edit set image ui:$(UI_TAG) 
 	kubectl apply -k deploy/kustomize/apps/ui/dev
 
 ui.dockerrun:

@@ -10,7 +10,7 @@ import { ServerStyleSheet } from "styled-components";
 
 export default class MyDocument extends Document {
     render() {
-        console.log("ENV_NAME from _document:", process.env.ENV_NAME);
+        //console.log("ENV_NAME from _document:", process.env.ENV_NAME);
         return (
             <Html>
                 <Head>

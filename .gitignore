@@ -31,3 +31,5 @@ playground
 justfile
 Taskfile.yaml
 src/jwt
+
+src/ui/dist
