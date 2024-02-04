@@ -23,7 +23,7 @@ export const GetEnv = () => {
 }
 
 export const GetConfig = () => {
-    console.log("scooby doo");
+    // console.log("scooby doo");
     const env = GetEnv();
     const config = {
         ...EnvConfig[env || "local"]

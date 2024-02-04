@@ -7,7 +7,13 @@ export function createRedisInstance() {
 
     let redis;
     try {
-        redis = new Redis();
+        redis = new Redis({
+            port: Number(config.REDIS_PORT),
+            host: config.REDIS_HOST,
+            // username: "default", // needs Redis >= 6
+            password: "KWXdkvjgAp"
+            // db: 0, // Defaults to 0
+        });
         return redis;
     } catch (e) {
         return null;
