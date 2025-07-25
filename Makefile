@@ -34,7 +34,7 @@ cluster.context:
 cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
-infra: infra.ingress infra.prometheus infra.metrics #infra.istio #infra.argocd 
+infra: infra.ingress infra.prometheus infra.metrics infra.istio #infra.argocd 
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -62,7 +62,7 @@ infra.ingress.upgrade:
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
 
-infra.istio: infra.istio.base infra.istio.gateway
+infra.istio: infra.istio.base infra.istio.gateway infra.istio.resources
 
 infra.istio.base:
 	-helm repo add istio https://istio-release.storage.googleapis.com/charts
@@ -74,6 +74,9 @@ infra.istio.base:
 infra.istio.gateway:
 	-kubectl create namespace istio-gateway
 	helm install istio-gateway istio/gateway -n istio-gateway --values ./deploy/helm/istio-gateway.yaml
+
+infra.istio.resources:
+	-kubectl apply -k deploy/kustomize/istio
 
 infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -111,7 +114,7 @@ infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/helm/metric-server.yaml
 
-app: api ui db
+app: api db
 
 db: db.deploy
 
@@ -119,27 +122,6 @@ db.deploy:
 	kubectl apply -k deploy/kustomize/apps/mysql/dev
 	kubectl apply -k deploy/kustomize/apps/postgres/dev
 	kubectl apply -k deploy/kustomize/apps/mongo/dev
-
-ui: ui.build ui.deploy
-
-ui.build:
-	docker build -t ui:latest -t ui:$(UI_TAG) src/ui
-	kind load docker-image ui:$(UI_TAG) --name $(CLUSTER_NAME)
-
-ui.deploy:
-	cd deploy/kustomize/apps/ui/dev && kustomize edit set image ui:$(UI_TAG) 
-	kubectl apply -k deploy/kustomize/apps/ui/dev
-
-ui.dockerrun:
-	docker run -p 3000:3000 ui:0.0.8 \
-		-e API_PROTOCOOL='http' \
-		-e API_EXTERNAL_URL='localhost' \
-		-e API_INTERNAL_URL='localhost' \
-		-e API_PORT='8080'
-
-
-ui.uninstall:
-	kubectl delete -k deploy/kustomize/apps/ui/dev
 
 api: api.build api.deploy
 
@@ -167,7 +149,3 @@ docker.clean:
 docker.compose:
 	docker compose build
 	docker compose up -d
-
-
-# gin_request_total
-# istio_request_total

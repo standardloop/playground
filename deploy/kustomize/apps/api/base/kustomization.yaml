@@ -8,5 +8,6 @@ resources:
   - service.yaml
   - ksa.yaml
   - servicemonitor.yaml
-  - ingress.yaml
+  - vs.yaml
   - hpa.yaml
+  - envoy-filter.yaml

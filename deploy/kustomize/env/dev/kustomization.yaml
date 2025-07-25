@@ -5,7 +5,7 @@ resources:
   - ../../apps/api/dev
   #- ../../apps/nginx/dev
   - ../../apps/postgres/dev
-  #- ../../apps/mysql/dev
+  - ../../apps/mysql/dev
   - ../../apps/mongo/dev
   #- ../../apps/ui/dev
   - namespace.yaml
