@@ -6,4 +6,3 @@ namespace: istio-gateway
 resources:
 - ./gateway.yaml
 - ./ingress.yaml
-

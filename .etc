@@ -8,3 +8,5 @@
 127.0.0.1       localhost prometheus.local
 127.0.0.1       localhost ui.local
 127.0.0.1       localhost api.local
+
+172.18.255.1    api-metallb.local

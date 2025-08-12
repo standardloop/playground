@@ -17,6 +17,8 @@ spec:
       containers:
         - image: mysql:8.0
           name: mysql
+          # args:
+          #   - "--ignore-db-dir=lost+found"
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
@@ -28,7 +30,7 @@ spec:
               name: mysql
           volumeMounts:
             - name: mysql-persistent-storage
-              mountPath: /var/lib/mysql
+              mountPath: /var/lib/mysqlplayground
       volumes:
         - name: mysql-persistent-storage
           persistentVolumeClaim:

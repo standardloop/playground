@@ -28,3 +28,42 @@ spec:
             function envoy_on_response(handle)
               handle:headers():add("x-api-local-lua-test", "true")
             end
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: api-local-gzip
+spec:
+  workloadSelector:
+    labels:
+      app: api
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+            subFilter:
+              name: envoy.filters.http.router
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.compressor
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.compressor.v3.Compressor
+          compressor_library:
+            name: text_optimized
+            typed_config:
+              '@type': type.googleapis.com/envoy.extensions.compression.gzip.compressor.v3.Gzip
+              compression_level: BEST_SPEED
+              compression_strategy: DEFAULT_STRATEGY
+          response_direction_config:
+            remove_accept_encoding_header: true
+            common_config:
+              enabled:
+                default_value: true
+                runtime_key: response_direction_config_enabled
+              content_type:
+                - application/json

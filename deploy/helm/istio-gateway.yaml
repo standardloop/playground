@@ -1,3 +1,7 @@
+# service:
+#   type: "LoadBalancer"
+#   annotations:
+#     metallb.universe.tf/address-pool: playground-pool
 service:
   type: "ClusterIP"
 # nodeSelector:

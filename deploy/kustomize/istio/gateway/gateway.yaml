@@ -10,6 +10,7 @@ spec:
   servers:
     - hosts:
         - api.local
+        - api-metallb.local
       port:
         name: http
         number: 80

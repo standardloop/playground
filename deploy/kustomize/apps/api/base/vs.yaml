@@ -9,6 +9,7 @@ spec:
     - istio-gateway/api-gateway
   hosts:
     - api.local
+    - api-metallb.local
   http:
     - route:
         - destination:

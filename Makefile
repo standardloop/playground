@@ -44,13 +44,13 @@ infra.redis:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 	helm repo update
 	kubectl create namespace redis
-	helm install my-redis bitnami/redis -n redis
+	helm upgrade --install my-redis bitnami/redis -n redis
 
 infra.ingress:
 	-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 	-helm repo update
 	-kubectl create namespace $(INGRESS_NAMESPACE)
-	helm install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
+	helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
 	kubectl wait --namespace $(INGRESS_NAMESPACE) \
 		--for=condition=ready pod \
 		--selector=app.kubernetes.io/component=controller \
@@ -68,12 +68,12 @@ infra.istio.base:
 	-helm repo add istio https://istio-release.storage.googleapis.com/charts
 	-helm repo update
 	-kubectl create namespace istio-system
-	helm install istio-base istio/base -n istio-system
-	helm install istiod istio/istiod -n istio-system --wait
+	helm upgrade --install istio-base istio/base -n istio-system
+	helm upgrade --install istiod istio/istiod -n istio-system --wait
 
 infra.istio.gateway:
 	-kubectl create namespace istio-gateway
-	helm install istio-gateway istio/gateway -n istio-gateway --values ./deploy/helm/istio-gateway.yaml
+	helm upgrade --install istio-gateway istio/gateway -n istio-gateway --values ./deploy/helm/istio-gateway.yaml
 
 infra.istio.resources:
 	-kubectl apply -k deploy/kustomize/istio
@@ -82,7 +82,7 @@ infra.prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update
 	kubectl create namespace kube-prometheus-stack
-	helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n $(PROM_STACK_NAMESPACE) --values ./deploy/helm/kube-prometheus-stack.yaml --version $(PROM_STACK_VERSION)
+	helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n $(PROM_STACK_NAMESPACE) --values ./deploy/helm/kube-prometheus-stack.yaml --version $(PROM_STACK_VERSION)
 
 infra.prometheus.upgrade:
 	helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack -n $(PROM_STACK_NAMESPACE) --values ./deploy/helm/kube-prometheus-stack.yaml --version $(PROM_STACK_VERSION)
@@ -114,7 +114,12 @@ infra.metrics:
 	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/helm/metric-server.yaml
 
-app: api db
+infra.metallb:
+	helm repo add metallb https://metallb.github.io/metallb
+	helm upgrade --install metallb metallb/metallb --namespace metallb-system --create-namespace
+	kubectl apply -k deploy/kustomize/infrastructure/metallb/
+
+app: api #db
 
 db: db.deploy
 
@@ -122,6 +127,11 @@ db.deploy:
 	kubectl apply -k deploy/kustomize/apps/mysql/dev
 	kubectl apply -k deploy/kustomize/apps/postgres/dev
 	kubectl apply -k deploy/kustomize/apps/mongo/dev
+
+db.clean:
+	kubectl delete -k deploy/kustomize/apps/mysql/dev
+	kubectl delete -k deploy/kustomize/apps/postgres/dev
+	kubectl delete -k deploy/kustomize/apps/mongo/dev
 
 api: api.build api.deploy
 

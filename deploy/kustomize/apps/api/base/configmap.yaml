@@ -5,21 +5,21 @@ metadata:
   name: api-cm
 data:
   # mysql
-  MYSQL_ENABLED: "true"
+  MYSQL_ENABLED: "false"
   MYSQL_HOST: "mysql"
   MYSQL_PORT: "3306"
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "mypassword"
   MYSQL_DBNAME: "playground"
   # postgresql
-  POSTGRES_ENABLED: "true"
+  POSTGRES_ENABLED: "false"
   POSTGRES_HOST: "postgres"
   POSTGRES_PORT: "5432"
   POSTGRES_USER: "root"
   POSTGRES_PASSWORD: "mypassword"
   POSTGRES_DBNAME: "playground"
   # mongo
-  MONGO_ENABLED: "true"
+  MONGO_ENABLED: "false"
   MONGO_HOST: "mongo"
   MONGO_PORT: "27017"
   MONGO_USER: "root"
