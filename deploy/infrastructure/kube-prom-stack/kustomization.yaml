@@ -6,5 +6,4 @@ namespace: kube-prometheus-stack
 
 resources:
   - namespace.yaml
-  - helm-repository.yaml
-  - helm-release.yaml
+  - release.yaml

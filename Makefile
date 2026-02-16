@@ -34,7 +34,7 @@ cluster.context:
 cluster.context.info:
 	kubectl cluster-info --context $(CLUSTER_CONTEXT)
 
-infra: infra.ingress infra.prometheus infra.metrics infra.istio #infra.argocd 
+infra: infra.ingress infra.prometheus infra.metrics infra.istio #infra.argocd
 
 infra.clean: infra.prometheus.clean infra.ingress.clean
 
@@ -91,7 +91,7 @@ infra.prometheus.password:
 	@echo "prom-operator"
 
 infra.prometheus.clean:
-	helm uninstall kube-prometheus-stack 
+	helm uninstall kube-prometheus-stack
 	kubectl delete crd alertmanagerconfigs.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 	kubectl delete crd alertmanagers.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
 	kubectl delete crd podmonitors.monitoring.coreos.com -n $(PROM_STACK_NAMESPACE)
@@ -132,7 +132,7 @@ api.build:
 	kind load docker-image api:$(API_TAG) --name $(CLUSTER_NAME)
 
 api.deploy:
-	cd deploy/kustomize/apps/api/dev && kustomize edit set image api:$(API_TAG) 
+	cd deploy/kustomize/apps/api/dev && kustomize edit set image api:$(API_TAG)
 	kubectl apply -k deploy/kustomize/apps/api/dev
 
 api.uninstall:

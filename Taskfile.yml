@@ -3,23 +3,20 @@
 version: '3'
 
 vars:
-  TEXT_BOLD: { sh: tput bold }
-  TEXT_GRAY: { sh: tput setaf 0 }
-  TEXT_RED: { sh: tput setaf 1 }
-  TEXT_GREEN: { sh: tput setaf 2 }
-  TEXT_YELLOW: { sh: tput setaf 3 }
-  TEXT_DARK_BLUE: { sh: tput setaf 4 }
-  TEXT_PURPLE: { sh: tput setaf 5 }
-  TEXT_LIGHT_BLUE: { sh: tput setaf 6 }
-  TEXT_RESET: { sh: tput sgr0 }
+  TEXT_BOLD: {sh: tput bold}
+  TEXT_GRAY: {sh: tput setaf 0}
+  TEXT_RED: {sh: tput setaf 1}
+  TEXT_GREEN: {sh: tput setaf 2}
+  TEXT_YELLOW: {sh: tput setaf 3}
+  TEXT_DARK_BLUE: {sh: tput setaf 4}
+  TEXT_PURPLE: {sh: tput setaf 5}
+  TEXT_LIGHT_BLUE: {sh: tput setaf 6}
+  TEXT_RESET: {sh: tput sgr0}
 
   CLUSTERS_FOLDER: kind
   CLUSTERS:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
 
-  INGRESS_NAMESPACE: ingress-nginx
-  PROM_STACK_NAMESPACE: kube-prometheus-stack
-  PROM_STACK_VERSION: 55.7.0
   API_TAG: 0.0.7
   DEPENDENCIES: docker kubectl helm kustomize kind kubectx curl jq
 
@@ -138,6 +135,7 @@ tasks:
       - kind:create
     interactive: true
     cmds:
+      - echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
       - sudo -v
       - bash -c 'nohup sudo cloud-provider-kind >/dev/null 2>&1 &'
     status:
@@ -168,9 +166,12 @@ tasks:
     aliases: [infrastructure]
     deps:
       - infra:flux:install
+      - infra:sources:install
       - infra:metrics-server:install
+      - infra:istio
 
   infra:flux:install:
+    runs: once
     deps:
       - kind:create
     cmds:
@@ -189,10 +190,20 @@ tasks:
     interactive: true
     cmds:
       - flux uninstall
+  
+  infra:sources:install:
+    runs: once
+    deps:
+      - infra:flux:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/sources
+    status:
+      - kubectl diff -k deploy/infrastructure/sources
 
   infra:metrics-server:install:
     deps:
       - infra:flux:install
+      - infra:sources:install
     cmds:
       - kubectl apply -k deploy/infrastructure/metrics-server
     status:
@@ -201,6 +212,35 @@ tasks:
   infra:metrics-server:clean:
     cmds:
       - kubectl delete -k deploy/infrastructure/metrics-server
-  
-  
+
+  infra:istio:
+    deps:
+      - infra:istio:install
+      - infra:istio:update-etc-hosts
+
+  infra:istio:install:
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/istio
+    status:
+      - kubectl diff -k deploy/infrastructure/istio
+
+  infra:istio:update-etc-hosts:
+    run: once
+    prompt: Do you want to update /etc/hosts ?
+    deps:
+      - infra:istio:install
+    cmds:
+      - echo {{.LOAD_BALANCER_IP}}
+      - sudo -v
+      - echo "{{.LOAD_BALANCER_IP}}      kind.local" | sudo tee -a /etc/hosts
+    status:
+      - cat /etc/hosts | grep {{.LOAD_BALANCER_IP}}
+    vars:
+      LOAD_BALANCER_IP:
+        sh: kubectl get gateway/kind-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
+
+
   # INFRA END

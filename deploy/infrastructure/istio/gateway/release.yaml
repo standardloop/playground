@@ -2,19 +2,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: metrics-server
+  name: istio-gateway
 spec:
   timeout: 5m
   interval: 15m
   chart:
     spec:
-      chart: metrics-server
+      chart: gateway
       # version: latest
       sourceRef:
         kind: HelmRepository
-        name: metrics-server
+        name: istio
+        namespace: flux-system
       interval: 5m
-  releaseName: metrics-server 
+  releaseName: istio-gateway
   install:
     remediation:
       retries: 3
@@ -25,10 +26,9 @@ spec:
     enable: false
   driftDetection:
     mode: disabled
+  # dependsOn:
+  #   - name: istio/istio-base
+  #   - name: istio/istiod
   values:
-    args:
-      - --cert-dir=/tmp
-      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-      - --kubelet-use-node-status-port
-      - --metric-resolution=15s
-      - --kubelet-insecure-tls
+    service:
+      type: "ClusterIP"

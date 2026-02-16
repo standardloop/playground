@@ -16,7 +16,7 @@ spec:
         name: metrics-server
         namespace: flux-system
       interval: 5m
-  releaseName: metrics-server 
+  releaseName: metrics-server
   install:
     remediation:
       retries: 3
