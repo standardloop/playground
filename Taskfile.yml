@@ -1,0 +1,206 @@
+---
+
+version: '3'
+
+vars:
+  TEXT_BOLD: { sh: tput bold }
+  TEXT_GRAY: { sh: tput setaf 0 }
+  TEXT_RED: { sh: tput setaf 1 }
+  TEXT_GREEN: { sh: tput setaf 2 }
+  TEXT_YELLOW: { sh: tput setaf 3 }
+  TEXT_DARK_BLUE: { sh: tput setaf 4 }
+  TEXT_PURPLE: { sh: tput setaf 5 }
+  TEXT_LIGHT_BLUE: { sh: tput setaf 6 }
+  TEXT_RESET: { sh: tput sgr0 }
+
+  CLUSTERS_FOLDER: kind
+  CLUSTERS:
+    sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
+
+  INGRESS_NAMESPACE: ingress-nginx
+  PROM_STACK_NAMESPACE: kube-prometheus-stack
+  PROM_STACK_VERSION: 55.7.0
+  API_TAG: 0.0.7
+  DEPENDENCIES: docker kubectl helm kustomize kind kubectx curl jq
+
+
+tasks:
+  default:
+    aliases: [all]
+    silent: true
+    deps:
+      - rancher
+      - kind
+      - infra
+
+  clean:
+    aliases: [delete]
+    ignore_error: true
+    silent: true
+    cmds:
+      - task: kind:clean
+      - task: rancher:clean
+
+  # TEXT START
+  text:test:
+    silent: true
+    cmds:
+      - echo "TEXT_NORMAL"
+      - echo "{{.TEXT_BOLD}}TEXT_BOLD{{.TEXT_RESET}}"
+      - echo "{{.TEXT_GRAY}}TEXT_GRAY{{.TEXT_RESET}}"
+      - echo "{{.TEXT_RED}}TEXT_RED{{.TEXT_RESET}}"
+      - echo "{{.TEXT_GREEN}}TEXT_GREEN{{.TEXT_RESET}}"
+      - echo "{{.TEXT_YELLOW}}TEXT_YELLOW{{.TEXT_RESET}}"
+      - echo "{{.TEXT_DARK_BLUE}}TEXT_DARK_BLUE{{.TEXT_RESET}}"
+      - echo "{{.TEXT_PURPLE}}TEXT_PURPLE{{.TEXT_RESET}}"
+      - echo "{{.TEXT_LIGHT_BLUE}}TEXT_LIGHT_BLUE{{.TEXT_RESET}}"
+  # TEXT END
+
+  # RANCHER START
+  rancher:
+    deps:
+      - rancher:run
+
+  rancher:run:
+    run: once
+    silent: true
+    cmds:
+      - rdctl start
+      - |
+        until docker info > /dev/null 2>&1
+        do
+          echo "{{.TEXT_YELLOW}}Waiting for docker to come up....{{.TEXT_RESET}}"
+          sleep 5
+        done
+        echo "{{.TEXT_GREEN}}Docker came up!{{.TEXT_RESET}}"
+    status:
+      - rdctl list-settings > /dev/null 2>&1
+      - docker info > /dev/null 2>&1
+
+  rancher:clean:
+    prompt: Do you want to update quit Rancher Desktop?
+    cmds:
+      - rdctl shutdown
+  # RANCHER END
+
+
+  # KIND START
+  kind:
+    silent: true
+    deps:
+      - kind:create
+      - kind:cloud-provider:run
+
+  kind:print:
+    silent: true
+    cmds:
+      - |
+        {{range .CLUSTERS | splitArgs}}
+          # echo "{{.}}"
+          cat "{{.}}" | yq .name
+        {{end}}
+
+  kind:create:
+    run: once
+    silent: true
+    deps:
+      - rancher:run
+    cmds:
+      - |
+        {{range .CLUSTERS | splitArgs}}
+          cluster_name=$(yq '.name' {{.}})
+          if ! kubectl cluster-info --context kind-${cluster_name} > /dev/null 2>&1
+          then
+            kind create cluster --config={{.}}
+          else
+            echo "$cluster_name already created"
+          fi
+        {{end}}
+    status:
+      - |
+        {{range .CLUSTERS | splitArgs}}
+          cluster_name=$(yq '.name' {{.}})
+          kubectl cluster-info --context kind-${cluster_name}
+        {{end}}
+
+  kind:clean:
+    silent: true
+    deps:
+      - rancher:run
+      - kind:cloud-provider:clean
+    cmds:
+      - kind delete clusters --all
+
+  kind:cloud-provider:run:
+    run: once
+    silent: true
+    deps:
+      - kind:create
+    interactive: true
+    cmds:
+      - sudo -v
+      - bash -c 'nohup sudo cloud-provider-kind >/dev/null 2>&1 &'
+    status:
+      - pgrep sudo cloud-provider-kind
+
+  kind:cloud-provider:clean:
+    silent: true
+    interactive: true
+    cmds:
+      - |
+        if pgrep sudo cloud-provider-kind > /dev/null 2>&1
+        then
+          sudo -v
+          sudo pkill cloud-provider-kind
+        else
+          echo "{{.TEXT_GRAY}}cloud-provider-kind is not running{{.TEXT_RESET}}"
+        fi
+
+  kind:cloud-provider:restart:
+    interactive: true
+    cmds:
+      - task: clean-cloud-provider-kind
+      - task: run-cloud-provider-kind
+  # KIND END
+
+  # INFRA START
+  infra:
+    aliases: [infrastructure]
+    deps:
+      - infra:flux:install
+      - infra:metrics-server:install
+
+  infra:flux:install:
+    deps:
+      - kind:create
+    cmds:
+      - flux install --components=source-controller,helm-controller
+    status:
+      - |
+        namespace_check=$(kubectl get ns flux-system -oyaml | yq .status.phase)
+        if [[ "$namespace_check" == "Active" ]]; then
+          exit 0
+        else
+          exit -1
+        fi
+
+  infra:flux:clean:
+    aliases: [infra:flux:uninstall, infra:flux:delete]
+    interactive: true
+    cmds:
+      - flux uninstall
+
+  infra:metrics-server:install:
+    deps:
+      - infra:flux:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/metrics-server
+    status:
+      - kubectl diff -k deploy/infrastructure/metrics-server
+
+  infra:metrics-server:clean:
+    cmds:
+      - kubectl delete -k deploy/infrastructure/metrics-server
+  
+  
+  # INFRA END

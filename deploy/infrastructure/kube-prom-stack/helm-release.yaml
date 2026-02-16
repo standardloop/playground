@@ -1,0 +1,67 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: metrics-server
+  namespace: kube-prometheus-stack
+spec:
+  timeout: 5m
+  interval: 15m
+  chart:
+    spec:
+      chart: metrics-server
+      # version: latest
+      sourceRef:
+        kind: HelmRepository
+        name: metrics-server
+        namespace: flux-system
+      interval: 5m
+  releaseName: metrics-server 
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  test:
+    enable: false
+  driftDetection:
+    mode: disabled
+  values:
+    alertmanager:
+      enabled: false
+    grafana:
+      ini:
+        server:
+          domain: grafana.local
+          root_url: "http://grafana.local"
+          serve_from_sub_path: true
+          enforce_domain: false
+          enable_gzip: true
+          router_logging: true
+      enabled: true
+      namespaceOverride: "kube-prometheus-stack"
+      defaultDashboardsEnabled: true
+      adminPassword: admin
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        #annotations:
+        hosts:
+          - grafana.local
+        path: /
+    prometheus:
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        # annotations:
+        hosts:
+          - prometheus.local
+        path: /
+      prometheusSpec:
+        serviceMonitorSelector:
+          matchLabels:
+            release: kube-prometheus-stack
+        podMonitorSelector:
+          matchLabels:
+            release: kube-prometheus-stack

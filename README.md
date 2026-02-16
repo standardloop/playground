@@ -1,19 +1,16 @@
 # playground
 This repo contains various tools and software to play around with.
 
-Please see the Makefile for more commands.
-
-## Check Dependencies
-```sh
-$ make check
-```
+Please run `task --list-all` to see available tasks
 
 ## Spin Up
+
 ```sh
-$ make all
+$ task
 ```
 
 ## Clean Up
-```
-$ make clean
+
+```sh
+$ task clean
 ```

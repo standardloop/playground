@@ -50,14 +50,14 @@ infra.ingress:
 	-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 	-helm repo update
 	-kubectl create namespace $(INGRESS_NAMESPACE)
-	helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
+	helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.13.3
 	kubectl wait --namespace $(INGRESS_NAMESPACE) \
 		--for=condition=ready pod \
 		--selector=app.kubernetes.io/component=controller \
 		--timeout=180s
 
 infra.ingress.upgrade:
-	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.0.6
+	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.13.3
 
 infra.ingress.clean:
 	helm uninstall ingress-nginx -n $(INGRESS_NAMESPACE)
@@ -110,14 +110,6 @@ infra.argocd.password:
 infra.argocd.clean:
 	kubectl delete -k deploy/kustomize/apps/argocd/dev
 
-infra.metrics:
-	helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-	helm upgrade --install metrics-server metrics-server/metrics-server -n kube-system --values ./deploy/helm/metric-server.yaml
-
-infra.metallb:
-	helm repo add metallb https://metallb.github.io/metallb
-	helm upgrade --install metallb metallb/metallb --namespace metallb-system --create-namespace
-	kubectl apply -k deploy/kustomize/infrastructure/metallb/
 
 app: api #db
 
