@@ -1,2 +1,12 @@
 ---
 extends: default
+
+ignore: |
+  deploy/kustomize
+
+rules:
+  braces:
+    max-spaces-inside: 1
+  brackets:
+    max-spaces-inside: 1
+  comments-indentation: disable

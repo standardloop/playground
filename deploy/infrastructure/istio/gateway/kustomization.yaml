@@ -9,3 +9,4 @@ resources:
   - release.yaml
   - k8s-gateway.yaml
   - httproute.yaml
+  - gateway.yaml

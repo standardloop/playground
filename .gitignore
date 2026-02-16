@@ -28,8 +28,8 @@ install_argo.sh
 foo.yaml
 src/ui/node_modules
 playground
-justfile
-Taskfile.yaml
 src/jwt
 
 src/ui/dist
+
+app.yaml

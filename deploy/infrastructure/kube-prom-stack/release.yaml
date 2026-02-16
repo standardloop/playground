@@ -46,7 +46,7 @@ spec:
       ingress:
         enabled: true
         ingressClassName: nginx
-        #annotations:
+        # annotations:
         hosts:
           - grafana.local
         path: /

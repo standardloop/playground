@@ -1,17 +1,18 @@
 ---
-
 version: '3'
 
+# yamllint disable rule:line-length
+
 vars:
-  TEXT_BOLD: {sh: tput bold}
-  TEXT_GRAY: {sh: tput setaf 0}
-  TEXT_RED: {sh: tput setaf 1}
-  TEXT_GREEN: {sh: tput setaf 2}
-  TEXT_YELLOW: {sh: tput setaf 3}
-  TEXT_DARK_BLUE: {sh: tput setaf 4}
-  TEXT_PURPLE: {sh: tput setaf 5}
-  TEXT_LIGHT_BLUE: {sh: tput setaf 6}
-  TEXT_RESET: {sh: tput sgr0}
+  TEXT_BOLD: { sh: tput bold }
+  TEXT_GRAY: { sh: tput setaf 0 }
+  TEXT_RED: { sh: tput setaf 1 }
+  TEXT_GREEN: { sh: tput setaf 2 }
+  TEXT_YELLOW: { sh: tput setaf 3 }
+  TEXT_DARK_BLUE: { sh: tput setaf 4 }
+  TEXT_PURPLE: { sh: tput setaf 5 }
+  TEXT_LIGHT_BLUE: { sh: tput setaf 6 }
+  TEXT_RESET: { sh: tput sgr0 }
 
   CLUSTERS_FOLDER: kind
   CLUSTERS:
@@ -19,7 +20,6 @@ vars:
 
   API_TAG: 0.0.7
   DEPENDENCIES: docker kubectl helm kustomize kind kubectx curl jq
-
 
 tasks:
   default:
@@ -171,7 +171,7 @@ tasks:
       - infra:istio
 
   infra:flux:install:
-    runs: once
+    run: once
     deps:
       - kind:create
     cmds:
@@ -190,9 +190,9 @@ tasks:
     interactive: true
     cmds:
       - flux uninstall
-  
+
   infra:sources:install:
-    runs: once
+    run: once
     deps:
       - infra:flux:install
     cmds:
@@ -214,11 +214,13 @@ tasks:
       - kubectl delete -k deploy/infrastructure/metrics-server
 
   infra:istio:
+    run: once
     deps:
       - infra:istio:install
       - infra:istio:update-etc-hosts
 
   infra:istio:install:
+    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -235,12 +237,12 @@ tasks:
     cmds:
       - echo {{.LOAD_BALANCER_IP}}
       - sudo -v
-      - echo "{{.LOAD_BALANCER_IP}}      kind.local" | sudo tee -a /etc/hosts
+      - echo "{{.LOAD_BALANCER_IP}}      playground.local" | sudo tee -a /etc/hosts
     status:
       - cat /etc/hosts | grep {{.LOAD_BALANCER_IP}}
     vars:
       LOAD_BALANCER_IP:
-        sh: kubectl get gateway/kind-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
+        sh: kubectl get gateway/playground-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
 
 
   # INFRA END
