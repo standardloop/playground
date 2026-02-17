@@ -5,18 +5,18 @@ metadata:
   name: grafana
 spec:
   hosts:
-    - "grafana.playground.local"
+  - "grafana.playground.local"
   gateways:
-    - istio-gateway/playground-local-gateway
+  - istio-gateway/playground-local-gateway
   http:
-    - match:
-        - uri:
-          prefix: /
-      route:
-        - destination:
-          host: kube-prometheus-stack-grafana
-          port:
-            number: 80
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: kube-prometheus-stack-grafana
+        port:
+          number: 80
 ---
 apiVersion: networking.istio.io/v1
 kind: VirtualService
@@ -24,15 +24,15 @@ metadata:
   name: prometheus
 spec:
   hosts:
-    - "prometheus.playground.local"
+  - "prometheus.playground.local"
   gateways:
-    - istio-gateway/playground-local-gateway
+  - istio-gateway/playground-local-gateway
   http:
-    - match:
-        - uri:
-          prefix: /
-      route:
-        - destination:
-          host: kube-prometheus-stack-prometheus
-          port:
-            number: 8080
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: kube-prometheus-stack-prometheus
+        port:
+          number: 8080
