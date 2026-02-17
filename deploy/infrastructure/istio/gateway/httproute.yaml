@@ -18,13 +18,13 @@ spec:
         - type: RequestHeaderModifier
           requestHeaderModifier:
             add:
-              - name: x-my-header
-                value: foo
+              - name: x-test-header
+                value: josh
         - type: ResponseHeaderModifier
           responseHeaderModifier:
             add:
-              - name: x-my-header
-                value: foo
+              - name: x-test-header
+                value: josh
       backendRefs:
         - name: istio-gateway
           port: 80

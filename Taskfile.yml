@@ -1,8 +1,6 @@
 ---
 version: '3'
 
-# yamllint disable rule:line-length
-
 check-docker-running: &check-docker-running |
   docker info > /dev/null 2>&1
 
@@ -21,8 +19,9 @@ vars:
   CLUSTERS:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
 
-  API_TAG: 0.0.7
   DEPENDENCIES: [docker, kubectl, kind, flux]
+
+  API_TAG: 0.0.7
 
 tasks:
   default:
@@ -294,3 +293,23 @@ tasks:
   ## KUBE_PROM_STACK END
 
   # INFRA END
+
+  # APP START
+  app:
+    cmds:
+      - kubectl apply -k deploy/apps
+  ## API START
+  app:api:build:
+    cmds:
+      - docker build -t api:latest -t api:{{.API_TAG}} src/api
+      - |
+        clusters=$(kind get clusters)
+        for cluster in $clusters; do
+          kind load docker-image api:{{.API_TAG}} --name $cluster
+        done
+  app:api:deploy:
+    cmds:
+      - cd deploy/apps/api/dev && kustomize edit set image api:{{.API_TAG}}
+      - kubectl apply -k deploy/apps/api/dev
+  ## API END
+  ## APP END

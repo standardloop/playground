@@ -33,3 +33,9 @@ src/jwt
 src/ui/dist
 
 app.yaml
+private/
+deploy/apps/ui/
+deploy/apps/nginx/
+deploy/apps/postgres/
+deploy/apps/mongo/
+deploy/apps/mysql/

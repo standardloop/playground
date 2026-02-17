@@ -11,3 +11,4 @@ rules:
     max-spaces-inside: 1
   comments-indentation: disable
   indentation: disable
+  line-length: disable
