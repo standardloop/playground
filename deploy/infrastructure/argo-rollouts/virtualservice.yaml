@@ -16,4 +16,4 @@ spec:
     - destination:
         host: argo-rollouts-dashboard
         port:
-          number: 31000
+          number: 3100

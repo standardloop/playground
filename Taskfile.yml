@@ -138,7 +138,7 @@ tasks:
     cmds:
       - |
         if docker info > /dev/null 2>&1; then
-          kind delete clusters --all > /dev/null 2>&1
+          kind delete clusters --all
         else
           echo "{{.TEXT_GRAY}}docker is not running so no clusters to clean right now{{.TEXT_RESET}}"
         fi
@@ -166,6 +166,7 @@ tasks:
           echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
           sudo -v
           sudo pkill cloud-provider-kind
+          echo "{{.TEXT_GREEN}}killed{{.TEXT_RESET}}"
         else
           echo "{{.TEXT_GRAY}}cloud-provider-kind is not running{{.TEXT_RESET}}"
         fi

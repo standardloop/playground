@@ -40,3 +40,5 @@ deploy/apps/postgres/
 deploy/apps/mongo/
 deploy/apps/mysql/
 .Makefile
+TODO.yaml
+*.sh
