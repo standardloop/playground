@@ -8,3 +8,4 @@ resources:
   - metrics-server.yaml
   - istio.yaml
   - prometheus-community.yaml
+  - argo.yaml

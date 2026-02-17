@@ -1,0 +1,32 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: argo-rollouts
+spec:
+  timeout: 5m
+  interval: 15m
+  chart:
+    spec:
+      chart: argo-rollouts
+      # version: latest
+      sourceRef:
+        kind: HelmRepository
+        name: argo
+        namespace: flux-system
+      interval: 5m
+  releaseName: argo-rollouts
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  test:
+    enable: false
+  driftDetection:
+    mode: disabled
+  values:
+    replicas: 1
+    dashboard:
+      enabled: true

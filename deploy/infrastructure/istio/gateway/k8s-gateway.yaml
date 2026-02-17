@@ -41,3 +41,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
+    - name: http-rollouts
+      protocol: HTTP
+      port: 80
+      hostname: "rollouts.playground.local"
+      allowedRoutes:
+        namespaces:
+          from: Same

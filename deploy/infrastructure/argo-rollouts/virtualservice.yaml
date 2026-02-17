@@ -1,0 +1,19 @@
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: argo-rollouts-dashboard
+spec:
+  hosts:
+  - "rollouts.playground.local"
+  gateways:
+  - istio-gateway/playground-local-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: argo-rollouts-dashboard
+        port:
+          number: 31000

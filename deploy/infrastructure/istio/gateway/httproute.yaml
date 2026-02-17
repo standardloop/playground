@@ -13,6 +13,7 @@ spec:
     - "api.playground.local"
     - "grafana.playground.local"
     - "prometheus.playground.local"
+    - "rollouts.playground.local"
   rules:
     - filters:
         - type: RequestHeaderModifier

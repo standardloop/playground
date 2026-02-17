@@ -17,3 +17,4 @@ spec:
         - "api.playground.local"
         - "grafana.playground.local"
         - "prometheus.playground.local"
+        - "rollouts.playground.local"
