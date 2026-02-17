@@ -9,6 +9,10 @@ spec:
       namespace: istio-gateway
   hostnames:
     - "playground.local"
+    - "www.playground.local"
+    - "api.playground.local"
+    - "grafana.playground.local"
+    - "prometheus.playground.local"
   rules:
     - filters:
         - type: RequestHeaderModifier

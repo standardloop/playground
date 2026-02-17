@@ -7,3 +7,4 @@ namespace: kube-prometheus-stack
 resources:
   - namespace.yaml
   - release.yaml
+  - virtualservice.yaml

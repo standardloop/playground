@@ -22,12 +22,6 @@ check.dependencies:
 		fi\
     done
 
-cluster:
-	kind create cluster --config=./kind-config.yaml
-
-cluster.clean:
-	kind delete cluster --name $(CLUSTER_NAME)
-
 cluster.context:
 	kubectx $(CLUSTER_CONTEXT)
 
@@ -45,16 +39,6 @@ infra.redis:
 	helm repo update
 	kubectl create namespace redis
 	helm upgrade --install my-redis bitnami/redis -n redis
-
-infra.ingress:
-	-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-	-helm repo update
-	-kubectl create namespace $(INGRESS_NAMESPACE)
-	helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.13.3
-	kubectl wait --namespace $(INGRESS_NAMESPACE) \
-		--for=condition=ready pod \
-		--selector=app.kubernetes.io/component=controller \
-		--timeout=180s
 
 infra.ingress.upgrade:
 	helm upgrade ingress-nginx ingress-nginx/ingress-nginx -n $(INGRESS_NAMESPACE) --values ./deploy/helm/ingress-nginx.yaml --version 4.13.3

@@ -13,3 +13,7 @@ spec:
         protocol: HTTP
       hosts:
         - "playground.local"
+        - "www.playground.local"
+        - "api.playground.local"
+        - "grafana.playground.local"
+        - "prometheus.playground.local"

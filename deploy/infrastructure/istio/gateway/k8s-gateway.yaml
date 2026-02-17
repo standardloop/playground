@@ -6,10 +6,38 @@ metadata:
 spec:
   gatewayClassName: cloud-provider-kind
   listeners:
-    - name: http
+    - name: http-root
       protocol: HTTP
       port: 80
       hostname: "playground.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-www
+      protocol: HTTP
+      port: 80
+      hostname: "www.playground.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-api
+      protocol: HTTP
+      port: 80
+      hostname: "api.playground.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-grafana
+      protocol: HTTP
+      port: 80
+      hostname: "grafana.playground.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-prometheus
+      protocol: HTTP
+      port: 80
+      hostname: "prometheus.playground.local"
       allowedRoutes:
         namespaces:
           from: Same

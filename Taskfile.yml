@@ -3,6 +3,9 @@ version: '3'
 
 # yamllint disable rule:line-length
 
+check-docker-running: &check-docker-running |
+  docker info > /dev/null 2>&1
+
 vars:
   TEXT_BOLD: { sh: tput bold }
   TEXT_GRAY: { sh: tput setaf 0 }
@@ -19,15 +22,13 @@ vars:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
 
   API_TAG: 0.0.7
-  DEPENDENCIES: docker kubectl helm kustomize kind kubectx curl jq
+  DEPENDENCIES: [docker, kubectl, kind, flux]
 
 tasks:
   default:
     aliases: [all]
     silent: true
     deps:
-      - rancher
-      - kind
       - infra
 
   clean:
@@ -37,6 +38,17 @@ tasks:
     cmds:
       - task: kind:clean
       - task: rancher:clean
+
+  check-dependencies:
+    silent: true
+    cmds:
+      - |
+        {{range .DEPENDENCIES}}
+          if ! which {{.}} > /dev/null; then
+            echo {{.}} not found;
+            exit 1;
+          fi
+        {{end}}
 
   # TEXT START
   text:test:
@@ -75,18 +87,18 @@ tasks:
       - docker info > /dev/null 2>&1
 
   rancher:clean:
-    prompt: Do you want to update quit Rancher Desktop?
+    # prompt: Do you want to update quit Rancher Desktop?
+    run: once
     cmds:
       - rdctl shutdown
   # RANCHER END
 
-
   # KIND START
   kind:
     silent: true
-    deps:
-      - kind:create
-      - kind:cloud-provider:run
+    run: once
+    cmds:
+      - task: kind:cloud-provider:run
 
   kind:print:
     silent: true
@@ -123,10 +135,14 @@ tasks:
   kind:clean:
     silent: true
     deps:
-      - rancher:run
       - kind:cloud-provider:clean
     cmds:
-      - kind delete clusters --all
+      - |
+        if docker info > /dev/null 2>&1; then
+          kind delete clusters --all > /dev/null 2>&1
+        else
+          echo "{{.TEXT_GRAY}}docker is not running so no clusters to clean right now{{.TEXT_RESET}}"
+        fi
 
   kind:cloud-provider:run:
     run: once
@@ -146,8 +162,8 @@ tasks:
     interactive: true
     cmds:
       - |
-        if pgrep sudo cloud-provider-kind > /dev/null 2>&1
-        then
+        if pgrep sudo cloud-provider-kind > /dev/null 2>&1; then
+          echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
           sudo -v
           sudo pkill cloud-provider-kind
         else
@@ -164,16 +180,16 @@ tasks:
   # INFRA START
   infra:
     aliases: [infrastructure]
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:metrics-server:install
-      - infra:istio
+    cmds:
+      - task: infra:metrics-server:install
+      - task: infra:istio
+      - task: infra:kube-prom-stack:install
 
+  ## FLUX START
   infra:flux:install:
     run: once
     deps:
-      - kind:create
+      - kind
     cmds:
       - flux install --components=source-controller,helm-controller
     status:
@@ -190,7 +206,9 @@ tasks:
     interactive: true
     cmds:
       - flux uninstall
+  ## FLUX END
 
+  ## SOURCES START
   infra:sources:install:
     run: once
     deps:
@@ -199,7 +217,9 @@ tasks:
       - kubectl apply -k deploy/infrastructure/sources
     status:
       - kubectl diff -k deploy/infrastructure/sources
+   ## SOURCES END
 
+  ## METRICS_SERVER START
   infra:metrics-server:install:
     deps:
       - infra:flux:install
@@ -212,12 +232,16 @@ tasks:
   infra:metrics-server:clean:
     cmds:
       - kubectl delete -k deploy/infrastructure/metrics-server
+  ## METRICS_SERVER END
 
+  ## ISTIO START
   infra:istio:
     run: once
     deps:
-      - infra:istio:install
-      - infra:istio:update-etc-hosts
+      - infra:sources:install
+    cmds:
+      - task: infra:istio:install
+      # - task: infra:istio:update-etc-hosts
 
   infra:istio:install:
     run: once
@@ -232,17 +256,41 @@ tasks:
   infra:istio:update-etc-hosts:
     run: once
     prompt: Do you want to update /etc/hosts ?
+    silent: true
     deps:
       - infra:istio:install
     cmds:
-      - echo {{.LOAD_BALANCER_IP}}
-      - sudo -v
-      - echo "{{.LOAD_BALANCER_IP}}      playground.local" | sudo tee -a /etc/hosts
+      - |
+        if [[ -n "{{.LOAD_BALANCER_IP}}" ]]; then
+          echo {{.LOAD_BALANCER_IP}}
+          sudo -v
+          echo "{{.LOAD_BALANCER_IP}}      playground.local" | sudo tee -a /etc/hosts
+        else
+          echo "{{.TEXT_RED}}Couldn't find IP address{{.TEXT_RESET}}"
+        fi
     status:
       - cat /etc/hosts | grep {{.LOAD_BALANCER_IP}}
     vars:
       LOAD_BALANCER_IP:
         sh: kubectl get gateway/playground-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
+  ## ISTIO END
 
+  ## KUBE_PROM_STACK START
+  infra:kube-prom-stack:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio
+    cmds:
+      - kubectl apply -k deploy/infrastructure/kube-prom-stack
+    status:
+      - kubectl diff -k deploy/infrastructure/kube-prom-stack
+
+  infra:kube-prom-stack:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/kube-prom-stack
+  ## KUBE_PROM_STACK END
 
   # INFRA END
