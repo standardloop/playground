@@ -28,7 +28,7 @@ tasks:
     aliases: [all]
     silent: true
     deps:
-      - infra
+      - app
 
   clean:
     aliases: [delete]
@@ -95,6 +95,7 @@ tasks:
   # KIND START
   kind:
     silent: true
+    aliases: ["cluster"]
     run: once
     cmds:
       - task: kind:cloud-provider:run
@@ -242,18 +243,34 @@ tasks:
     deps:
       - infra:sources:install
     cmds:
-      - task: infra:istio:install
+      - task: infra:istio:base:install
+      - task: infra:istio:gateway:install
       # - task: infra:istio:update-etc-hosts
 
-  infra:istio:install:
+  infra:istio:base:install:
     run: once
     deps:
       - infra:flux:install
       - infra:sources:install
     cmds:
-      - kubectl apply -k deploy/infrastructure/istio
+      - kubectl apply -k deploy/infrastructure/istio/base
     status:
-      - kubectl diff -k deploy/infrastructure/istio
+      - kubectl diff -k deploy/infrastructure/istio/base
+
+  infra:istio:gateway:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio:base:install
+    preconditions:
+      - |
+        helm status istio-base -n istio-system | grep -q "STATUS: deployed"
+        helm status istiod -n istio-system | grep -q "STATUS: deployed"
+    cmds:
+      - kubectl apply -k deploy/infrastructure/istio/gateway
+    status:
+      - kubectl diff -k deploy/infrastructure/istio/gateway
 
   infra:istio:update-etc-hosts:
     run: once
@@ -317,27 +334,11 @@ tasks:
 
   # APP START
   app:
+    deps:
+      - infra
     cmds:
-      - kubectl apply -k deploy/apps
-  ## API START
-  app:api:build:
+      - tilt ci
+  app:clean:
     cmds:
-      - docker build -t api:latest -t api:{{.API_TAG}} src/api
-      - |
-        clusters=$(kind get clusters)
-        for cluster in $clusters; do
-          kind load docker-image api:{{.API_TAG}} --name $cluster
-        done
-    # status:
-    #   - |
-    #     clusters=$(kind get clusters)
-    #     for cluster in $clusters; do
-    #       docker exec -it $cluster-worker crictl images | grep docker.io/library/api | grep {{.API_TAG}}
-    #     done
-
-  app:api:deploy:
-    cmds:
-      - cd deploy/apps/api/dev && kustomize edit set image api:{{.API_TAG}}
-      - kubectl apply -k deploy/apps/api/dev
-  ## API END
-  ## APP END
+      - tilt down
+  # APP END

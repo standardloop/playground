@@ -2,7 +2,7 @@
 extends: default
 
 ignore: |
-  deploy/kustomize
+  archive/
 
 rules:
   braces:

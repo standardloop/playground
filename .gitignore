@@ -42,3 +42,4 @@ deploy/apps/mysql/
 .Makefile
 TODO.yaml
 *.sh
+archive

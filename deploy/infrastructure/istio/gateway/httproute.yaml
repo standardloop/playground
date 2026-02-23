@@ -6,7 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: playground-local-gateway
+      group: gateway.networking.k8s.io
+      kind: Gateway
       namespace: istio-gateway
+      sectionName: http
   hostnames:
     - "playground.local"
     - "www.playground.local"

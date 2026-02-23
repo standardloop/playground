@@ -16,13 +16,13 @@ spec:
         app: api
         sidecar.istio.io/inject: "true"
     spec:
-      serviceAccountName: api-ksa
+      serviceAccountName: api
       containers:
         - name: api
           image: api:0.0.1
           envFrom:
             - configMapRef:
-                name: api-cm
+                name: api
           resources:
             requests:
               memory: "64Mi"
