@@ -1,8 +1,6 @@
 ---
 version: '3'
 
-check-docker-running: &check-docker-running |
-  docker info > /dev/null 2>&1
 
 vars:
   TEXT_BOLD: { sh: tput bold }
@@ -73,12 +71,19 @@ tasks:
     run: once
     silent: true
     cmds:
-      - rdctl start
+      - rdctl start --application.start-in-background
       - |
-        until docker info > /dev/null 2>&1
+        attempts=30
+        while ! docker info > /dev/null 2>&1
         do
           echo "{{.TEXT_YELLOW}}Waiting for docker to come up....{{.TEXT_RESET}}"
           sleep 5
+          let attempts=$attempts-1
+          if [ $attempts -eq 0 ]
+          then
+            echo "{{.TEXT_RED}}docker never came up!{{.TEXT_RESET}}"
+            exit 1
+          fi
         done
         echo "{{.TEXT_GREEN}}Docker came up!{{.TEXT_RESET}}"
     status:
@@ -263,11 +268,11 @@ tasks:
       - infra:flux:install
       - infra:sources:install
       - infra:istio:base:install
-    preconditions:
-      - |
-        helm status istio-base -n istio-system | grep -q "STATUS: deployed"
-        helm status istiod -n istio-system | grep -q "STATUS: deployed"
     cmds:
+      - kubectl wait --for condition=established --timeout=60s crd gateways.gateway.networking.k8s.io
+      - kubectl wait --for condition=established --timeout=60s crd gatewayclasses.gateway.networking.k8s.io
+      - kubectl wait --for condition=established --timeout=60s crd httproutes.gateway.networking.k8s.io
+      - kubectl wait --for condition=established --timeout=60s crd gateways.networking.istio.io
       - kubectl apply -k deploy/infrastructure/istio/gateway
     status:
       - kubectl diff -k deploy/infrastructure/istio/gateway
@@ -302,6 +307,7 @@ tasks:
       - infra:sources:install
       - infra:istio
     cmds:
+      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
       - kubectl apply -k deploy/infrastructure/kube-prom-stack
     status:
       - kubectl diff -k deploy/infrastructure/kube-prom-stack
@@ -320,6 +326,7 @@ tasks:
       - infra:sources:install
       - infra:istio
     cmds:
+      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
       - kubectl apply -k deploy/infrastructure/argo-rollouts
     status:
       - kubectl diff -k deploy/infrastructure/argo-rollouts
@@ -336,7 +343,12 @@ tasks:
   app:
     deps:
       - infra
+    preconditions:
+      - tilt verify-install
     cmds:
+      - kubectl wait --for condition=established --timeout=60s crd envoyfilters.networking.istio.io
+      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
+      - kubectl wait --for condition=established --timeout=60s crd servicemonitors.monitoring.coreos.com
       - tilt ci
   app:clean:
     cmds:
