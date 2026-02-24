@@ -47,6 +47,27 @@ tasks:
           fi
         {{end}}
 
+  # HELPER START
+  wait-for-crd:
+    internal: true
+    silent: true
+    cmds:
+      - |
+        attempts=30
+        while ! kubectl wait --for condition=established --timeout=60s crd {{.CRD}} > /dev/null 2>&1
+        do
+          echo "{{.TEXT_YELLOW}}Waiting for CRD to be ready....{{.TEXT_RESET}}"
+          sleep 5
+          let attempts=$attempts-1
+          if [ $attempts -eq 0 ]
+          then
+            echo "{{.TEXT_RED}}CRD never got ready!{{.TEXT_RESET}}"
+            exit 1
+          fi
+        done
+        echo "{{.TEXT_GREEN}}CRD came up!{{.TEXT_RESET}}"
+  # HELPER END
+
   # TEXT START
   text:test:
     silent: true
@@ -160,6 +181,12 @@ tasks:
       - sudo -v
       - bash -c 'nohup sudo cloud-provider-kind --gateway-channel standard >/dev/null 2>&1 &'
       - echo "{{.TEXT_GREEN}}$(pgrep sudo cloud-provider-kind){{.TEXT_RESET}}"
+      - task: wait-for-crd
+        vars: { CRD: "httproutes.gateway.networking.k8s.io" }
+      - task: wait-for-crd
+        vars: { CRD: "gateways.gateway.networking.k8s.io" }
+      - task: wait-for-crd
+        vars: { CRD: "gatewayclasses.gateway.networking.k8s.io" }
     status:
       - pgrep sudo cloud-provider-kind
 
@@ -222,6 +249,8 @@ tasks:
     deps:
       - infra:flux:install
     cmds:
+      # - task: wait-for-crd
+      #   vars: { CRD: "gateways.gateway.networking.k8s.io" }
       - kubectl apply -k deploy/infrastructure/sources
     status:
       - kubectl diff -k deploy/infrastructure/sources
@@ -269,10 +298,14 @@ tasks:
       - infra:sources:install
       - infra:istio:base:install
     cmds:
-      - kubectl wait --for condition=established --timeout=60s crd gateways.gateway.networking.k8s.io
-      - kubectl wait --for condition=established --timeout=60s crd gatewayclasses.gateway.networking.k8s.io
-      - kubectl wait --for condition=established --timeout=60s crd httproutes.gateway.networking.k8s.io
-      - kubectl wait --for condition=established --timeout=60s crd gateways.networking.istio.io
+      - task: wait-for-crd
+        vars: { CRD: "gateways.gateway.networking.k8s.io" }
+      - task: wait-for-crd
+        vars: { CRD: "gatewayclasses.gateway.networking.k8s.io" }
+      - task: wait-for-crd
+        vars: { CRD: "httproutes.gateway.networking.k8s.io" }
+      - task: wait-for-crd
+        vars: { CRD: "gateways.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/istio/gateway
     status:
       - kubectl diff -k deploy/infrastructure/istio/gateway
@@ -307,7 +340,8 @@ tasks:
       - infra:sources:install
       - infra:istio
     cmds:
-      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/kube-prom-stack
     status:
       - kubectl diff -k deploy/infrastructure/kube-prom-stack
@@ -326,7 +360,8 @@ tasks:
       - infra:sources:install
       - infra:istio
     cmds:
-      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/argo-rollouts
     status:
       - kubectl diff -k deploy/infrastructure/argo-rollouts
@@ -346,10 +381,14 @@ tasks:
     preconditions:
       - tilt verify-install
     cmds:
-      - kubectl wait --for condition=established --timeout=60s crd envoyfilters.networking.istio.io
-      - kubectl wait --for condition=established --timeout=60s crd virtualservices.networking.istio.io
-      - kubectl wait --for condition=established --timeout=60s crd servicemonitors.monitoring.coreos.com
+      - task: wait-for-crd
+        vars: { CRD: "servicemonitors.monitoring.coreos.com" }
+      - task: wait-for-crd
+        vars: { CRD: "envoyfilters.networking.istio.io" }
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
       - tilt ci
+
   app:clean:
     cmds:
       - tilt down
