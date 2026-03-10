@@ -2,8 +2,8 @@
 version: '3'
 
 includes:
-  rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.1/rancher.yml
-  color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.1/color.yml
+  rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/rancher.yml
+  color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/color.yml
 
 vars:
   CLUSTERS_FOLDER: kind
@@ -142,7 +142,7 @@ tasks:
           echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
           sudo -v
           sudo pkill cloud-provider-kind
-          echo "{{.TEXT_GREEN}}killed{{.TEXT_RESET}}"
+          echo "{{.TEXT_GREEN}}killed cloud-provider-kind{{.TEXT_RESET}}"
         else
           echo "{{.TEXT_GRAY}}cloud-provider-kind is not running{{.TEXT_RESET}}"
         fi
