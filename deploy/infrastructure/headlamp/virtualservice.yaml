@@ -1,0 +1,19 @@
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: headlamp
+spec:
+  hosts:
+  - "headlamp.playground.local"
+  gateways:
+  - istio-gateway/playground-local-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: headlamp
+        port:
+          number: 80

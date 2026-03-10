@@ -162,6 +162,7 @@ tasks:
       - task: infra:istio
       - task: infra:kube-prom-stack:install
       - task: infra:argo-rollouts:install
+      - task: infra:headlamp:install
 
   ## FLUX START
   infra:flux:install:
@@ -314,6 +315,34 @@ tasks:
     cmds:
       - kubectl delete -k deploy/infrastructure/argo-rollouts
   ## ARGO_ROLLOUTS END
+
+  ## HEADLAMP START
+  infra:headlamp:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio
+    cmds:
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
+      - kubectl apply -k deploy/infrastructure/headlamp
+      - kubectl -n kube-system create serviceaccount headlamp-admin  # wip
+    status:
+      - kubectl diff -k deploy/infrastructure/headlamp
+
+  infra:headlamp:token:
+    deps:
+      - infra:headlamp:install
+    cmds:
+      - kubectl create clusterrolebinding headlamp-playground-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
+      - kubectl create token headlamp-admin -n kube-system | pbcopy
+
+  infra:headlamp:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/headlamp
+  ## HEADLAMP END
 
   # INFRA END
 

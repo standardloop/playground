@@ -9,3 +9,4 @@ resources:
   - istio.yaml
   - prometheus-community.yaml
   - argo.yaml
+  - headlamp.yaml

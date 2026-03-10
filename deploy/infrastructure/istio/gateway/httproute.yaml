@@ -17,6 +17,7 @@ spec:
     - "grafana.playground.local"
     - "prometheus.playground.local"
     - "rollouts.playground.local"
+    - "headlamp.playground.local"
   rules:
     - filters:
         - type: RequestHeaderModifier

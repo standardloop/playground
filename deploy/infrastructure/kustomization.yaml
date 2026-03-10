@@ -8,3 +8,4 @@ resources:
   - metrics-server
   - kube-prom-stack
   - argo-rollouts
+  - headlamp
