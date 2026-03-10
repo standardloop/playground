@@ -1,24 +1,15 @@
 ---
 version: '3'
 
+includes:
+  rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.1/rancher.yml
+  color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.1/color.yml
 
 vars:
-  TEXT_BOLD: { sh: tput bold }
-  TEXT_GRAY: { sh: tput setaf 0 }
-  TEXT_RED: { sh: tput setaf 1 }
-  TEXT_GREEN: { sh: tput setaf 2 }
-  TEXT_YELLOW: { sh: tput setaf 3 }
-  TEXT_DARK_BLUE: { sh: tput setaf 4 }
-  TEXT_PURPLE: { sh: tput setaf 5 }
-  TEXT_LIGHT_BLUE: { sh: tput setaf 6 }
-  TEXT_RESET: { sh: tput sgr0 }
-
   CLUSTERS_FOLDER: kind
   CLUSTERS:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
-
   DEPENDENCIES: [docker, kubectl, kind, flux]
-
   API_TAG: 0.0.7
 
 tasks:
@@ -56,73 +47,25 @@ tasks:
         attempts=30
         while ! kubectl wait --for condition=established --timeout=60s crd {{.CRD}} > /dev/null 2>&1
         do
-          echo "{{.TEXT_YELLOW}}Waiting for CRD to be ready....{{.TEXT_RESET}}"
+          echo "{{.TEXT_YELLOW}}Waiting for {{.CRD}} to be ready....{{.TEXT_RESET}}"
           sleep 5
           let attempts=$attempts-1
           if [ $attempts -eq 0 ]
           then
-            echo "{{.TEXT_RED}}CRD never got ready!{{.TEXT_RESET}}"
+            echo "{{.TEXT_RED}}{{.CRD}} never got ready!{{.TEXT_RESET}}"
             exit 1
           fi
         done
-        echo "{{.TEXT_GREEN}}CRD came up!{{.TEXT_RESET}}"
+        echo "{{.TEXT_GREEN}}{{.CRD}} came up!{{.TEXT_RESET}}"
   # HELPER END
-
-  # TEXT START
-  text:test:
-    silent: true
-    cmds:
-      - echo "TEXT_NORMAL"
-      - echo "{{.TEXT_BOLD}}TEXT_BOLD{{.TEXT_RESET}}"
-      - echo "{{.TEXT_GRAY}}TEXT_GRAY{{.TEXT_RESET}}"
-      - echo "{{.TEXT_RED}}TEXT_RED{{.TEXT_RESET}}"
-      - echo "{{.TEXT_GREEN}}TEXT_GREEN{{.TEXT_RESET}}"
-      - echo "{{.TEXT_YELLOW}}TEXT_YELLOW{{.TEXT_RESET}}"
-      - echo "{{.TEXT_DARK_BLUE}}TEXT_DARK_BLUE{{.TEXT_RESET}}"
-      - echo "{{.TEXT_PURPLE}}TEXT_PURPLE{{.TEXT_RESET}}"
-      - echo "{{.TEXT_LIGHT_BLUE}}TEXT_LIGHT_BLUE{{.TEXT_RESET}}"
-  # TEXT END
-
-  # RANCHER START
-  rancher:
-    deps:
-      - rancher:run
-
-  rancher:run:
-    run: once
-    silent: true
-    cmds:
-      - rdctl start --application.start-in-background
-      - |
-        attempts=30
-        while ! docker info > /dev/null 2>&1
-        do
-          echo "{{.TEXT_YELLOW}}Waiting for docker to come up....{{.TEXT_RESET}}"
-          sleep 5
-          let attempts=$attempts-1
-          if [ $attempts -eq 0 ]
-          then
-            echo "{{.TEXT_RED}}docker never came up!{{.TEXT_RESET}}"
-            exit 1
-          fi
-        done
-        echo "{{.TEXT_GREEN}}Docker came up!{{.TEXT_RESET}}"
-    status:
-      - rdctl list-settings > /dev/null 2>&1
-      - docker info > /dev/null 2>&1
-
-  rancher:clean:
-    # prompt: Do you want to update quit Rancher Desktop?
-    run: once
-    cmds:
-      - rdctl shutdown
-  # RANCHER END
 
   # KIND START
   kind:
     silent: true
     aliases: ["cluster"]
     run: once
+    deps:
+      - rancher:run
     cmds:
       - task: kind:cloud-provider:run
 
@@ -180,7 +123,7 @@ tasks:
       - echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
       - sudo -v
       - bash -c 'nohup sudo cloud-provider-kind --gateway-channel standard >/dev/null 2>&1 &'
-      - echo "{{.TEXT_GREEN}}$(pgrep sudo cloud-provider-kind){{.TEXT_RESET}}"
+      - echo "{{.TEXT_GREEN}}main pid:$(pgrep sudo cloud-provider-kind){{.TEXT_RESET}}"
       - task: wait-for-crd
         vars: { CRD: "httproutes.gateway.networking.k8s.io" }
       - task: wait-for-crd
