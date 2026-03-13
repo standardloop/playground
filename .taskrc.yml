@@ -2,6 +2,8 @@
 experiments:
   REMOTE_TASKFILES: 1
 
+interactive: true
+
 remote:
   insecure: false
   offline: false

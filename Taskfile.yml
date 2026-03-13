@@ -4,6 +4,10 @@ version: '3'
 includes:
   rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/rancher.yml
   color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/color.yml
+  colima: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/colima.yml
+
+silent: true
+runs: once
 
 vars:
   CLUSTERS_FOLDER: kind
@@ -11,10 +15,14 @@ vars:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
   DEPENDENCIES: [docker, kubectl, kind, flux]
   API_TAG: 0.0.7
+  HELM_RELEASE_TIMEOUT: "180s"
+  SUPPORTED_DOCKER_ENGINES: [colima, rancher]
+
+dotenv: ['.env']
 
 tasks:
   default:
-    aliases: [all]
+    aliases: [all, playground]
     silent: true
     deps:
       - app
@@ -25,7 +33,71 @@ tasks:
     silent: true
     cmds:
       - task: kind:clean
-      - task: rancher:clean
+      - task: docker-engine:clean
+
+  # DOCKER ENGINE START
+  docker-engine:test:
+    runs: once
+    requires:
+      vars:
+        - name: DOCKER_ENGINE
+    preconditions:
+      - sh: |
+          {{range .SUPPORTED_DOCKER_ENGINES -}}
+          if [ "{{.}}" = "{{$.DOCKER_ENGINE}}" ]; then exit 0; fi
+          {{end -}}
+          exit 1
+        msg: |
+          Invalid engine "{{.DOCKER_ENGINE}}".
+          Supported engines are: {{join ", " .SUPPORTED_DOCKER_ENGINES}}
+    cmds:
+      - echo {{.DOCKER_ENGINE}}
+
+  docker-engine:start:
+    aliases: [docker-engine:run]
+    runs: once
+    requires:
+      vars:
+        - name: DOCKER_ENGINE
+    preconditions:
+      - sh: |
+          {{range .SUPPORTED_DOCKER_ENGINES -}}
+          if [ "{{.}}" = "{{$.DOCKER_ENGINE}}" ]; then exit 0; fi
+          {{end -}}
+          exit 1
+        msg: |
+          Invalid engine "{{.DOCKER_ENGINE}}".
+          Supported engines are: {{join ", " .SUPPORTED_DOCKER_ENGINES}}
+    cmds:
+      - if: '{{eq .DOCKER_ENGINE "colima"}}'
+        task: colima:start
+      - if: '{{eq .DOCKER_ENGINE "rancher"}}'
+        task: rancher:start
+    status:
+      - '{{if eq .DOCKER_ENGINE "colima"}} colima status > /dev/null 2>&1 {{else}} true {{end}}'
+      - '{{if eq .DOCKER_ENGINE "rancher"}} rdctl list-settings > /dev/null 2>&1 {{else}} true {{end}}'
+      - docker info > /dev/null 2>&1
+
+  docker-engine:clean:
+    runs: once
+    requires:
+      vars:
+        - name: DOCKER_ENGINE
+    preconditions:
+      - sh: |
+          {{range .SUPPORTED_DOCKER_ENGINES -}}
+          if [ "{{.}}" = "{{$.DOCKER_ENGINE}}" ]; then exit 0; fi
+          {{end -}}
+          exit 1
+        msg: |
+          Invalid engine "{{.DOCKER_ENGINE}}".
+          Supported engines are: {{join ", " .SUPPORTED_DOCKER_ENGINES}}
+    cmds:
+      - if: '{{eq .DOCKER_ENGINE "colima"}}'
+        task: colima:clean
+      - if: '{{eq .DOCKER_ENGINE "rancher"}}'
+        task: rancher:clean
+  # DOCKER ENGINE END
 
   check-dependencies:
     silent: true
@@ -65,7 +137,7 @@ tasks:
     aliases: ["cluster"]
     run: once
     deps:
-      - rancher:run
+      - docker-engine:start
     cmds:
       - task: kind:cloud-provider:run
 
@@ -82,7 +154,7 @@ tasks:
     run: once
     silent: true
     deps:
-      - rancher:run
+      - docker-engine:start
     cmds:
       - |
         {{range .CLUSTERS | splitArgs}}
@@ -123,7 +195,7 @@ tasks:
       - echo "{{.TEXT_YELLOW}}sudo needed for cloud-provider-kind{{.TEXT_RESET}}"
       - sudo -v
       - bash -c 'nohup sudo cloud-provider-kind --gateway-channel standard >/dev/null 2>&1 &'
-      - echo "{{.TEXT_GREEN}}main pid:$(pgrep sudo cloud-provider-kind){{.TEXT_RESET}}"
+      - echo "{{.TEXT_GREEN}}main pid -> $(pgrep sudo cloud-provider-kind){{.TEXT_RESET}}"
       - task: wait-for-crd
         vars: { CRD: "httproutes.gateway.networking.k8s.io" }
       - task: wait-for-crd
@@ -232,6 +304,8 @@ tasks:
       - infra:sources:install
     cmds:
       - kubectl apply -k deploy/infrastructure/istio/base
+      - kubectl wait helmrelease/istio-base --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}} -n istio-system
+      - kubectl wait helmrelease/istiod --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-system
     status:
       - kubectl diff -k deploy/infrastructure/istio/base
 
@@ -251,6 +325,7 @@ tasks:
       - task: wait-for-crd
         vars: { CRD: "gateways.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/istio/gateway
+      - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
     status:
       - kubectl diff -k deploy/infrastructure/istio/gateway
 
