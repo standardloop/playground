@@ -2,9 +2,9 @@
 version: '3'
 
 includes:
-  rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/rancher.yml
-  color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/color.yml
-  colima: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.2/colima.yml
+  color: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.4/color.yml
+  rancher: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.4/rancher.yml
+  colima: https://raw.githubusercontent.com/standardloop/taskfiles/refs/tags/v0.0.4/colima.yml
 
 silent: true
 runs: once
@@ -71,8 +71,12 @@ tasks:
     cmds:
       - if: '{{eq .DOCKER_ENGINE "colima"}}'
         task: colima:start
+        vars:
+          COLIMA_FLAGS: "--network-address --cpu {{.DOCKER_ENGINE_CPUS}} --memory {{.DOCKER_ENGINE_MEMORY}}"
       - if: '{{eq .DOCKER_ENGINE "rancher"}}'
         task: rancher:start
+        vars:
+          RANCHER_FLAGS: "--virtual-machine.number-cpus {{.DOCKER_ENGINE_CPUS}} --virtual-machine.memory-in-gb {{.DOCKER_ENGINE_MEMORY}}"
     status:
       - '{{if eq .DOCKER_ENGINE "colima"}} colima status > /dev/null 2>&1 {{else}} true {{end}}'
       - '{{if eq .DOCKER_ENGINE "rancher"}} rdctl list-settings > /dev/null 2>&1 {{else}} true {{end}}'
