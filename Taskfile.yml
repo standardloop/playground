@@ -17,6 +17,7 @@ vars:
   API_TAG: 0.0.7
   HELM_RELEASE_TIMEOUT: "180s"
   SUPPORTED_DOCKER_ENGINES: [colima, rancher]
+  SUPPORTED_K8S_ENGINES: [kind]
 
 dotenv: ['.env']
 
