@@ -1,0 +1,81 @@
+package config
+
+import (
+	"encoding/json"
+	"os"
+	"reflect"
+	"strconv"
+)
+
+// secret management later
+type config struct {
+	AppPort  string `json:"appPort" env:"APPLICATION_PORT" envDefault:"8080"`
+	LogLevel string `json:"logLevel" env:"LOG_LEVEL" envDefault:"INFO"`
+
+	MySQLEnabled bool   `json:"mySQLEnabled" env:"MYSQL_ENABLED" envDefault:"false"`
+	MySQLHost    string `json:"mySQLHost" env:"MYSQL_HOST" envDefault:"localhost"`
+	MySQLPort    string `json:"mySQLPort" env:"MYSQL_PORT" envDefault:"3306"`
+	MySQLUser    string `json:"mySQLUser" env:"MYSQL_USER" envDefault:"root"`
+	MySQLPass    string `json:"mySQLPass" env:"MYSQL_PASS" envDefault:"mypassword"`
+	MySQLDBName  string `json:"mySQLDBName" env:"MYSQL_DBNAME" envDefault:"playground"`
+
+	PostgresEnabled bool   `json:"postgresEnabled" env:"POSTGRES_ENABLED" envDefault:"false"`
+	PostgresHost    string `json:"postgresHost" env:"POSTGRES_HOST" envDefault:"localhost"`
+	PostgresPort    string `json:"postgresPort" env:"POSTGRES_PORT" envDefault:"5432"`
+	PostgresUser    string `json:"postgresUser" env:"POSTGRES_USER" envDefault:"root"`
+	PostgresPass    string `json:"postgresPass" env:"POSTGRES_PASS" envDefault:"mypassword"`
+	PostgresDBName  string `json:"postgresDBName" env:"POSTGRES_DBNAME" envDefault:"playground"`
+
+	MongoEnabled bool   `json:"mongoEnabled" env:"MONGO_ENABLED" envDefault:"false"`
+	MongoHost    string `json:"mongoHost" env:"MONGO_HOST" envDefault:"localhost"`
+	MongoPort    string `json:"mongoPort" env:"MONGO_PORT" envDefault:"27017"`
+	MongoUser    string `json:"mongoUser" env:"MONGO_USER" envDefault:"root"`
+	MongoPass    string `json:"mongoPass" env:"MONGO_PASS" envDefault:"mypassword"`
+	MongoDBName  string `json:"mongoDBName" env:"MONGO_DBNAME" envDefault:"playground"`
+}
+
+func parseEnvVars(cfg interface{}) error {
+	envVarValue := reflect.ValueOf(cfg).Elem()
+	envVarType := envVarValue.Type()
+
+	for i := 0; i < envVarValue.NumField(); i++ {
+		field := envVarValue.Field(i)
+		fieldType := envVarType.Field(i)
+
+		envKey := fieldType.Tag.Get("env")
+		defaultValue := fieldType.Tag.Get("envDefault")
+
+		if envKey == "" {
+			continue
+		}
+
+		val, exists := os.LookupEnv(envKey)
+		if !exists || val == "" {
+			val = defaultValue
+		}
+
+		if field.CanSet() && field.Kind() == reflect.String {
+			field.SetString(val)
+		} else if field.CanSet() && field.Kind() == reflect.Bool {
+			valAsBool, _ := strconv.ParseBool(val)
+			field.SetBool(valAsBool)
+		}
+	}
+	return nil
+}
+
+func initEnvironment() config {
+	cfg := config{}
+	err := parseEnvVars(&cfg)
+	if err != nil {
+		os.Exit(1)
+	}
+	return cfg
+}
+
+func (conf config) String() string {
+	jsonData, _ := json.Marshal(conf)
+	return string(jsonData)
+}
+
+var Env config = initEnvironment()
