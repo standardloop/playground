@@ -7,3 +7,7 @@ namespace: kube-system
 resources:
   - release.yaml
   - virtualservice.yaml
+
+labels:
+  - pairs:
+      environment: playground

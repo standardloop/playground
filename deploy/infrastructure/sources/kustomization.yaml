@@ -10,3 +10,8 @@ resources:
   - prometheus-community.yaml
   - argo.yaml
   - headlamp.yaml
+  - grafana-operator.yaml
+
+labels:
+  - pairs:
+      environment: playground

@@ -5,3 +5,7 @@ kind: Kustomization
 resources:
   - infrastructure
   - apps
+
+labels:
+  - pairs:
+      environment: playground

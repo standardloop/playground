@@ -8,3 +8,7 @@ resources:
   - namespace.yaml
   - base.yaml
   - istiod.yaml
+
+labels:
+  - pairs:
+      environment: playground

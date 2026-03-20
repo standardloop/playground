@@ -32,6 +32,9 @@ type config struct {
 	MongoUser    string `json:"mongoUser" env:"MONGO_USER" envDefault:"root"`
 	MongoPass    string `json:"mongoPass" env:"MONGO_PASS" envDefault:"mypassword"`
 	MongoDBName  string `json:"mongoDBName" env:"MONGO_DBNAME" envDefault:"playground"`
+
+	ShortSha string `json:"shortsha" env:"SHORT_SHA" envDefault:"12345678"`
+	GitTag   string `json:"tag" env:"GIT_TAG" envDefault:"v1.0.0"`
 }
 
 func parseEnvVars(cfg interface{}) error {

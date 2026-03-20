@@ -2,6 +2,8 @@ package server
 
 import (
 	"api-std/config"
+	v1 "api-std/server/handlers/api/v1"
+	"api-std/server/handlers/health"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -16,13 +18,18 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func envHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, config.Env.String())
-}
-
 func Init() {
-	mux := http.NewServeMux()
-	mux.Handle("GET /env", loggingMiddleware(http.HandlerFunc(envHandler)))
+	mainMux := http.NewServeMux()
+	apiMux := http.NewServeMux()
 
-	http.ListenAndServe(fmt.Sprintf(":%s", config.Env.AppPort), mux)
+	apiMux.HandleFunc("/", http.HandlerFunc(v1.NotFoundHandler))
+	apiMux.Handle("GET /env", loggingMiddleware(http.HandlerFunc(v1.EnvHandler)))
+
+	mainMux.Handle(config.ApiVersion+"/", http.StripPrefix(config.ApiVersion, apiMux))
+
+	mainMux.Handle("/health", loggingMiddleware(http.HandlerFunc(health.HealthHandler)))
+
+	//mainMux.NotFound = loggingMiddleware(http.HandlerFunc(handlers.NotFoundHandler))
+
+	http.ListenAndServe(fmt.Sprintf(":%s", config.Env.AppPort), mainMux)
 }

@@ -2,12 +2,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: kube-prometheus-stack
+namespace: grafana
 
 resources:
-  - namespace.yaml
-  - release.yaml
+  - grafana.yaml
   - virtualservice.yaml
+  # - dashboards
 
 labels:
   - pairs:

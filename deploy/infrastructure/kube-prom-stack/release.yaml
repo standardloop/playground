@@ -30,18 +30,18 @@ spec:
     alertmanager:
       enabled: false
     grafana:
-      ini:
-        server:
-          domain: grafana.local
-          root_url: "http://grafana.playground.local"
-          serve_from_sub_path: true
-          enforce_domain: false
-          enable_gzip: true
-          router_logging: true
-      enabled: true
-      namespaceOverride: "kube-prometheus-stack"
-      defaultDashboardsEnabled: true
-      adminPassword: admin
+      # ini:
+      #   server:
+      #     domain: grafana.local
+      #     root_url: "http://grafana.playground.local"
+      #     serve_from_sub_path: true
+      #     enforce_domain: false
+      #     enable_gzip: true
+      #     router_logging: true
+      enabled: false
+      # namespaceOverride: "kube-prometheus-stack"
+      # defaultDashboardsEnabled: true
+      # adminPassword: admin
       ingress:
         enabled: false
         # ingressClassName: nginx

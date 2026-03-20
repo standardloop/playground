@@ -5,3 +5,7 @@ kind: Kustomization
 resources:
   - base
   - gateway
+
+labels:
+  - pairs:
+      environment: playground

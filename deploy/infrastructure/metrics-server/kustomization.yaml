@@ -6,3 +6,7 @@ namespace: kube-system
 
 resources:
   - release.yaml
+
+labels:
+  - pairs:
+      environment: playground

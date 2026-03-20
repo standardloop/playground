@@ -26,8 +26,9 @@ tasks:
   default:
     aliases: [all, playground]
     silent: true
-    deps:
-      - app
+    prompt: "This will lanuch a cluster with infrastructure and deploy an app, are you ready for this?"
+    cmds:
+      - task: app
 
   clean:
     aliases: [delete]
@@ -35,6 +36,7 @@ tasks:
     silent: true
     cmds:
       - task: kind:clean
+      - task: compose:clean
       - task: docker-engine:clean
 
   print:
@@ -111,6 +113,27 @@ tasks:
       - if: '{{eq .DOCKER_ENGINE "rancher"}}'
         task: rancher:clean
   # DOCKER ENGINE END
+
+  # COMPOSE START
+  compose:start:
+    silent: true
+    preconditions:
+      - docker info > /dev/null 2>&1
+    deps:
+      - docker-engine:start
+    cmds:
+      - docker compose up -d
+
+  compose:clean:
+    silent: true
+    cmds:
+      - |
+        if docker info > /dev/null 2>&1; then
+          docker compose down
+        else
+          echo "{{.TEXT_GRAY}}docker is not running so no compose to clean right now{{.TEXT_RESET}}"
+        fi
+  # COMPOSE END
 
   check-dependencies:
     silent: true
@@ -246,8 +269,18 @@ tasks:
       - task: infra:metrics-server:install
       - task: infra:istio
       - task: infra:kube-prom-stack:install
+      - task: infra:grafana:install
       - task: infra:argo-rollouts:install
       - task: infra:headlamp:install
+
+  infra:clean:
+    cmds:
+      - task: infra:metrics-server:clean
+      - task: infra:istio:clean
+      - task: infra:kube-prom-stack:clean
+      - task: infra:grafana:clean
+      - task: infra:argo-rollouts:clean
+      - task: infra:headlamp:clean
 
   ## FLUX START
   infra:flux:install:
@@ -431,6 +464,59 @@ tasks:
     cmds:
       - kubectl delete -k deploy/infrastructure/headlamp
   ## HEADLAMP END
+
+  ## GRAFANA START
+  infra:grafana:install:
+    run: once
+    cmds:
+      - task: infra:grafana:operator:install
+      - task: infra:grafana:dashboards:install
+
+  infra:grafana:clean:
+    run: once
+    cmds:
+      - task: infra:grafana:dashboards:clean
+      - task: infra:grafana:operator:clean
+
+  ### GRAFANA OPERATOR START
+  infra:grafana:operator:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/grafana-operator
+    status:
+      - kubectl diff -k deploy/infrastructure/grafana-operator
+
+  infra:grafana:operator:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/grafana-operator
+  ### GRAFANA DASHBOARDS START
+  infra:grafana:dashboards:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio
+    cmds:
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
+      - task: wait-for-crd
+        vars: { CRD: "grafanas.grafana.integreatly.org" }
+      - task: wait-for-crd
+        vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
+      - kubectl apply -k deploy/infrastructure/grafana-dashboards
+    status:
+      - kubectl diff -k deploy/infrastructure/grafana-dashboards
+
+  infra:grafana:dashboards:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/grafana-dashboards
+  ### GRAFANA DASHBOARDS START
+  ## GRAFANA END
 
   # INFRA END
 
