@@ -1,0 +1,20 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: playground-prometheus
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true
+  datasource:
+    access: proxy
+    database: prometheus
+    isDefault: true
+    jsonData:
+      timeInterval: 5s
+      tlsSkipVerify: true
+    name: playground-prometheus
+    type: prometheus
+    url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090

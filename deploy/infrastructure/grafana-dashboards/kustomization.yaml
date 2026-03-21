@@ -7,10 +7,11 @@ namespace: grafana
 resources:
   - grafana.yaml
   - virtualservice.yaml
+  - datasource.yaml
   # - dashboards
 
 labels:
   - pairs:
       environment: playground
     # includeSelectors: true  # Updates matchLabels/selectors
-    includeTemplates: true  # Updates pod template labels
+    # includeTemplates: true  # Updates pod template labels
