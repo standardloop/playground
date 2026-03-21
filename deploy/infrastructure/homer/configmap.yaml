@@ -139,7 +139,7 @@ data:
             logo: "https://grafana.com/media/docs/grafana-cloud/infrastructure/grafanalogo.svg"
             tag: "infra"
             keywords: "Grafana"
-            url: "http://grafana.playground.local"
+            url: "http://grafana.playground.local/dashboards"
             endpoint: "http://grafana.playground.local/api/health"
             type: "Ping"
             target: "_blank" # optional html tag target attribute

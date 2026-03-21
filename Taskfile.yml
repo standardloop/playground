@@ -269,20 +269,20 @@ tasks:
       - task: infra:metrics-server:install
       - task: infra:istio
       - task: infra:kube-prom-stack:install
-      - task: infra:grafana:install
       - task: infra:argo-rollouts:install
       - task: infra:headlamp:install
       - task: infra:homer:install
+      - task: infra:grafana:install
 
   infra:clean:
     cmds:
       - task: infra:metrics-server:clean
       - task: infra:istio:clean
       - task: infra:kube-prom-stack:clean
-      - task: infra:grafana:clean
       - task: infra:argo-rollouts:clean
       - task: infra:headlamp:clean
       - task: infra:homer:clean
+      - task: infra:grafana:clean
 
   ## FLUX START
   infra:flux:install:
@@ -474,12 +474,14 @@ tasks:
     run: once
     cmds:
       - task: infra:grafana:operator:install
+      - task: infra:grafana:instance:install
       - task: infra:grafana:dashboards:install
 
   infra:grafana:clean:
     run: once
     cmds:
       - task: infra:grafana:dashboards:clean
+      - task: infra:grafana:instance:clean
       - task: infra:grafana:operator:clean
 
   ### GRAFANA OPERATOR START
@@ -489,16 +491,16 @@ tasks:
       - infra:flux:install
       - infra:sources:install
     cmds:
-      - kubectl apply -k deploy/infrastructure/grafana-operator
+      - kubectl apply -k deploy/infrastructure/grafana/operator
     status:
-      - kubectl diff -k deploy/infrastructure/grafana-operator
+      - kubectl diff -k deploy/infrastructure/grafana/operator
 
   infra:grafana:operator:clean:
     run: once
     cmds:
-      - kubectl delete -k deploy/infrastructure/grafana-operator
-  ### GRAFANA DASHBOARDS START
-  infra:grafana:dashboards:install:
+      - kubectl delete -k deploy/infrastructure/grafana/operator
+  ### GRAFANA INSTANCE START
+  infra:grafana:instance:install:
     run: once
     deps:
       - infra:flux:install
@@ -511,15 +513,37 @@ tasks:
         vars: { CRD: "grafanas.grafana.integreatly.org" }
       - task: wait-for-crd
         vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
-      - kubectl apply -k deploy/infrastructure/grafana-dashboards
+      - kubectl apply -k deploy/infrastructure/grafana/instance
     status:
-      - kubectl diff -k deploy/infrastructure/grafana-dashboards
+      - kubectl diff -k deploy/infrastructure/grafana/instance
 
+  infra:grafana:instance:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/grafana/instance
+  ### GRAFANA INSTANCE END
+  ### GRAFANA DASHBOARDS START
+  infra:grafana:dashboards:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+    cmds:
+      - task: wait-for-crd
+        vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
+      - helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards -f deploy/infrastructure/grafana/dashboards/values.yaml --namespace grafana
+    status:
+      - |
+        helm template deploy/infrastructure/grafana/dashboards --name-template=grafana-dashboards \
+          -n grafana \
+          --is-upgrade \
+          --no-hooks \
+          --values deploy/infrastructure/grafana/dashboards/values.yaml | kubectl diff -f -
   infra:grafana:dashboards:clean:
     run: once
     cmds:
-      - kubectl delete -k deploy/infrastructure/grafana-dashboards
-  ### GRAFANA DASHBOARDS START
+      - helm delete grafana-dashboards -n grafana
+  ### GRAFANA DASHBOARDS END
   ## GRAFANA END
 
   ## HOMER START

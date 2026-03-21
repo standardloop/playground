@@ -1,0 +1,11 @@
+---
+grafana:
+  dashboard:
+    resyncPeriod: 720h
+    # resyncPeriod: 30s
+
+dashboards:
+  - name: argo-rollouts-overview
+    displayName: Argo Rollouts Overview
+    folder: Argo Rollouts
+    dashboardJSONFile: argo-rollouts-overview.json

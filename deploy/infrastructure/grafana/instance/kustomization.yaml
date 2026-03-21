@@ -8,7 +8,6 @@ resources:
   - grafana.yaml
   - virtualservice.yaml
   - datasource.yaml
-  # - dashboards
 
 labels:
   - pairs:

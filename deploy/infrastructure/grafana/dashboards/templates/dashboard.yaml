@@ -1,0 +1,18 @@
+{{- range $.Values.dashboards }}
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: {{ .name }}
+  labels:
+    dashboards: grafana
+    environment: playground
+spec:
+  resyncPeriod: {{ $.Values.grafana.dashboard.resyncPeriod }}
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: {{ .folder }}
+  json: >
+{{- $.Files.Get (printf "dashboards/%s" .dashboardJSONFile) | nindent 4 }}
+{{- end -}}
