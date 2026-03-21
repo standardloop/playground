@@ -15,3 +15,5 @@ resources:
 labels:
   - pairs:
       environment: playground
+    # includeSelectors: true  # Updates matchLabels/selectors
+    includeTemplates: true  # Updates pod template labels
