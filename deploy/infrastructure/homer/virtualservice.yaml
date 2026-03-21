@@ -1,0 +1,31 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: homer-to-home-redirect
+spec:
+  gateways:
+    - istio-gateway/playground-local-gateway
+  hosts:
+    - "homer.playground.local"
+  http:
+  - redirect:
+      authority: home.playground.local
+      redirectCode: 301
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: homer
+spec:
+  gateways:
+    - istio-gateway/playground-local-gateway
+  hosts:
+    - "home.playground.local"
+  http:
+    - route:
+        - destination:
+            host: homer
+            port:
+              number: 80
+          weight: 100

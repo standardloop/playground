@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homer
+  labels:
+    app: homer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homer
+  template:
+    metadata:
+      labels:
+        app: homer
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+      - name: main
+        image: b4bz/homer:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: INIT_ASSETS
+          value: "1"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /www/assets/config.yml
+          subPath: config.yml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: homer

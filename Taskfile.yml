@@ -272,6 +272,7 @@ tasks:
       - task: infra:grafana:install
       - task: infra:argo-rollouts:install
       - task: infra:headlamp:install
+      - task: infra:homer:install
 
   infra:clean:
     cmds:
@@ -281,6 +282,7 @@ tasks:
       - task: infra:grafana:clean
       - task: infra:argo-rollouts:clean
       - task: infra:headlamp:clean
+      - task: infra:homer:clean
 
   ## FLUX START
   infra:flux:install:
@@ -370,6 +372,8 @@ tasks:
         vars: { CRD: "httproutes.gateway.networking.k8s.io" }
       - task: wait-for-crd
         vars: { CRD: "gateways.networking.istio.io" }
+      - task: wait-for-crd
+        vars: { CRD: "envoyfilters.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/istio/gateway
       - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
     status:
@@ -448,7 +452,7 @@ tasks:
       - task: wait-for-crd
         vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/headlamp
-      - kubectl -n kube-system create serviceaccount headlamp-admin  # wip
+      # - kubectl -n kube-system create serviceaccount headlamp-admin  # wip
     status:
       - kubectl diff -k deploy/infrastructure/headlamp
 
@@ -517,6 +521,26 @@ tasks:
       - kubectl delete -k deploy/infrastructure/grafana-dashboards
   ### GRAFANA DASHBOARDS START
   ## GRAFANA END
+
+  ## HOMER START
+  infra:homer:install:
+    run: once
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio
+    cmds:
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
+      - kubectl apply -k deploy/infrastructure/homer
+    status:
+      - kubectl diff -k deploy/infrastructure/homer
+
+  infra:homer:clean:
+    run: once
+    cmds:
+      - kubectl delete -k deploy/infrastructure/homer
+  ## HOMER END
 
   # INFRA END
 

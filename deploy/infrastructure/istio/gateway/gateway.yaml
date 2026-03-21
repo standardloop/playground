@@ -19,3 +19,5 @@ spec:
         - "prometheus.playground.local"
         - "rollouts.playground.local"
         - "headlamp.playground.local"
+        - "homer.playground.local"
+        - "home.playground.local"

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: headlamp
-      # version: latest
+      version: 0.40.0  # 0.40.1 has an issue
       sourceRef:
         kind: HelmRepository
         name: headlamp
