@@ -521,14 +521,17 @@ tasks:
     cmds:
       - task: wait-for-crd
         vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
-      - helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards -f deploy/infrastructure/grafana/dashboards/values.yaml --namespace grafana
+      - helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards -f deploy/infrastructure/grafana/dashboards/values.yaml --namespace {{.NAMESPACE}}
     status:
       - |
         helm template deploy/infrastructure/grafana/dashboards --name-template=grafana-dashboards \
-          -n grafana \
+          --namespace {{.NAMESPACE}} \
           --is-upgrade \
           --no-hooks \
-          --values deploy/infrastructure/grafana/dashboards/values.yaml | kubectl diff -f -
+          -f deploy/infrastructure/grafana/dashboards/values.yaml | kubectl diff -f - -n {{.NAMESPACE}}
+    vars:
+      NAMESPACE: grafana
+
   infra:grafana:dashboards:clean:
     run: once
     cmds:
