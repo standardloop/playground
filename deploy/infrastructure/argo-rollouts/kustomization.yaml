@@ -7,7 +7,6 @@ namespace: argo-rollouts
 resources:
   - namespace.yaml
   - release.yaml
-  - virtualservice.yaml
 
 labels:
   - pairs:

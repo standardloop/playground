@@ -11,6 +11,7 @@ resources:
   - httproute.yaml
   - gateway.yaml
   - envoyfilter.yaml
+  - virtualservices
 
 labels:
   - pairs:

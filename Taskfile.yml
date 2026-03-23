@@ -265,14 +265,14 @@ tasks:
   # INFRA START
   infra:
     aliases: [infrastructure]
-    cmds:
-      - task: infra:metrics-server:install
-      - task: infra:istio
-      - task: infra:kube-prom-stack:install
-      - task: infra:argo-rollouts:install
-      - task: infra:headlamp:install
-      - task: infra:homer:install
-      - task: infra:grafana:install
+    deps:
+      - infra:istio:install
+      - infra:metrics-server:install
+      - infra:kube-prom-stack:install
+      - infra:headlamp:install
+      - infra:homer:install
+      - infra:grafana:install
+      - infra:argo-rollouts:install
 
   infra:clean:
     cmds:
@@ -313,8 +313,6 @@ tasks:
     deps:
       - infra:flux:install
     cmds:
-      # - task: wait-for-crd
-      #   vars: { CRD: "gateways.gateway.networking.k8s.io" }
       - kubectl apply -k deploy/infrastructure/sources
     status:
       - kubectl diff -k deploy/infrastructure/sources
@@ -336,7 +334,7 @@ tasks:
   ## METRICS_SERVER END
 
   ## ISTIO START
-  infra:istio:
+  infra:istio:install:
     run: once
     deps:
       - infra:sources:install
@@ -374,6 +372,8 @@ tasks:
         vars: { CRD: "gateways.networking.istio.io" }
       - task: wait-for-crd
         vars: { CRD: "envoyfilters.networking.istio.io" }
+      - task: wait-for-crd
+        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/istio/gateway
       - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
     status:
@@ -407,10 +407,7 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio
     cmds:
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/kube-prom-stack
     status:
       - kubectl diff -k deploy/infrastructure/kube-prom-stack
@@ -427,10 +424,7 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio
     cmds:
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/argo-rollouts
     status:
       - kubectl diff -k deploy/infrastructure/argo-rollouts
@@ -447,10 +441,7 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio
     cmds:
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/headlamp
       # - kubectl -n kube-system create serviceaccount headlamp-admin  # wip
     status:
@@ -505,10 +496,8 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio
+      - infra:grafana:operator:install
     cmds:
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
       - task: wait-for-crd
         vars: { CRD: "grafanas.grafana.integreatly.org" }
       - task: wait-for-crd
@@ -528,6 +517,7 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
+      - infra:grafana:operator:install
     cmds:
       - task: wait-for-crd
         vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
@@ -552,10 +542,7 @@ tasks:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio
     cmds:
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
       - kubectl apply -k deploy/infrastructure/homer
     status:
       - kubectl diff -k deploy/infrastructure/homer

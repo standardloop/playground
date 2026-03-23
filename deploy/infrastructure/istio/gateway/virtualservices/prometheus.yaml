@@ -2,10 +2,10 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: grafana
+  name: prometheus
 spec:
   hosts:
-  - "grafana.playground.local"
+  - "prometheus.playground.local"
   gateways:
   - istio-gateway/playground-local-gateway
   http:
@@ -14,6 +14,6 @@ spec:
         prefix: /
     route:
     - destination:
-        host: grafana-service
+        host: kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local
         port:
-          number: 3000
+          number: 9090

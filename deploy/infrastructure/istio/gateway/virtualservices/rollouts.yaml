@@ -7,13 +7,13 @@ spec:
   hosts:
   - "rollouts.playground.local"
   gateways:
-  - istio-gateway/playground-local-gateway
+  - playground-local-gateway
   http:
   - match:
     - uri:
         prefix: /
     route:
     - destination:
-        host: argo-rollouts-dashboard
+        host: argo-rollouts-dashboard.argo-rollouts.svc.cluster.local
         port:
           number: 3100

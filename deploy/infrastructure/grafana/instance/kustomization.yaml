@@ -6,7 +6,6 @@ namespace: grafana
 
 resources:
   - grafana.yaml
-  - virtualservice.yaml
   - datasource.yaml
 
 labels:

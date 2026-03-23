@@ -2,10 +2,10 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: prometheus
+  name: headlamp
 spec:
   hosts:
-  - "prometheus.playground.local"
+  - "headlamp.playground.local"
   gateways:
   - istio-gateway/playground-local-gateway
   http:
@@ -14,6 +14,6 @@ spec:
         prefix: /
     route:
     - destination:
-        host: kube-prometheus-stack-prometheus
+        host: headlamp.kube-system.svc.cluster.local
         port:
-          number: 9090
+          number: 80

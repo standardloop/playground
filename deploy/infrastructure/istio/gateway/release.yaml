@@ -26,9 +26,11 @@ spec:
     enable: false
   driftDetection:
     mode: disabled
-  # dependsOn:
-  #   - name: istio/istio-base
-  #   - name: istio/istiod
+  dependsOn:
+    - name: istio-base
+      namespace: istio-system
+    - name: istiod
+      namespace: istio-system
   values:
     service:
       type: "ClusterIP"

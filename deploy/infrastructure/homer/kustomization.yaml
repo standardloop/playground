@@ -9,7 +9,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - configmap.yaml
-  - virtualservice.yaml
 
 labels:
   - pairs:
