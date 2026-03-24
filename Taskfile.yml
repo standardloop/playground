@@ -551,6 +551,7 @@ tasks:
       - infra:sources:install
     cmds:
       - kubectl apply -k deploy/infrastructure/homer
+      - open "http://home.playground.local"
     status:
       - kubectl diff -k deploy/infrastructure/homer
 
