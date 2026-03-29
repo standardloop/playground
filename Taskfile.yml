@@ -11,7 +11,6 @@ vars:
   CLUSTERS_FOLDER: kind
   CLUSTERS:
     sh: find ./{{.CLUSTERS_FOLDER}} -maxdepth 1 -type f
-  DEPENDENCIES: [docker, kubectl, kind, flux]
   API_TAG: 0.0.7
   HELM_RELEASE_TIMEOUT: "180s"
   SUPPORTED_DOCKER_ENGINES: [colima, rancher]
@@ -138,17 +137,6 @@ tasks:
           echo "{{.TEXT_GRAY}}docker is not running so no compose to clean right now{{.TEXT_RESET}}"
         fi
   # COMPOSE END
-
-  check-dependencies:
-    silent: true
-    cmds:
-      - |
-        {{range .DEPENDENCIES}}
-          if ! which {{.}} > /dev/null; then
-            echo {{.}} not found;
-            exit 1;
-          fi
-        {{end}}
 
   # HELPER START
   wait-for-crd:
