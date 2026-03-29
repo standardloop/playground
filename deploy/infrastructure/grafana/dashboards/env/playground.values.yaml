@@ -1,0 +1,6 @@
+---
+dashboards:
+  - name: argo-rollouts-overview
+    displayName: Argo Rollouts Overview
+    folder: Argo Rollouts
+    dashboardJSONFile: argo-rollouts-overview.json

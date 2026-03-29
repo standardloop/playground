@@ -8,7 +8,7 @@ metadata:
     dashboards: grafana
     environment: playground
 spec:
-  resyncPeriod: {{ $.Values.grafana.dashboard.resyncPeriod }}
+  resyncPeriod: {{ $.Values.resyncPeriod }}
   instanceSelector:
     matchLabels:
       dashboards: grafana

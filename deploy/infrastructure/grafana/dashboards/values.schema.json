@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "dashboards": {
+      "description": "List of Grafana dashboards",
+      "items": {
+        "properties": {
+          "dashboardJSONFile": {
+            "description": "Path to JSON Grafana dashboard",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "Display name in Grafana",
+            "type": "string"
+          },
+          "folder": {
+            "description": "Folder in Grafana where the dashboard where live",
+            "type": "string"
+          },
+          "name": {
+            "description": "Unique name identifier for the GrafanaDashboard resource",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "displayName",
+          "folder",
+          "dashboardJSONFile"
+        ],
+        "type": "object"
+      },
+      "title": "Dashboards",
+      "type": "array"
+    },
+    "global": {
+      "description": "Global values are values that can be accessed from any chart or subchart by exactly the same name.",
+      "required": [],
+      "title": "global",
+      "type": "object"
+    },
+    "resyncPeriod": {
+      "default": "720h",
+      "description": "Period until Grafana resyncs a dashboard with the GrafanaDashboard resource",
+      "title": "Re-Sync Period",
+      "type": "string"
+    }
+  },
+  "required": [],
+  "type": "object"
+}

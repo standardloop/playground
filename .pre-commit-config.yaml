@@ -5,8 +5,19 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+        exclude_types: [json]
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
     hooks:
       - id: yamllint
         args: [--strict]
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.14.2
+    hooks:
+      - id: helm-docs
+  - repo: https://github.com/dadav/helm-schema
+    rev: 0.22.0
+    hooks:
+      - id: helm-schema
+        args:
+          - --helm-docs-compatibility-mode

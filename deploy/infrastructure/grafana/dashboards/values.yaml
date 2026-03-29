@@ -1,11 +1,34 @@
 ---
-grafana:
-  dashboard:
-    resyncPeriod: 720h
-    # resyncPeriod: 30s
+# @schema
+# title: "Re-Sync Period"
+# type: string
+# @schema
+# -- Period until Grafana resyncs a dashboard with the GrafanaDashboard resource
+resyncPeriod: 720h
 
-dashboards:
-  - name: argo-rollouts-overview
-    displayName: Argo Rollouts Overview
-    folder: Argo Rollouts
-    dashboardJSONFile: argo-rollouts-overview.json
+# @schema
+# title: "Dashboards"
+# type: array
+# items:
+#   type: object
+#   required:
+#     - name
+#     - displayName
+#     - folder
+#     - dashboardJSONFile
+#   properties:
+#     name:
+#       type: string
+#       description: "Unique name identifier for the GrafanaDashboard resource"
+#     displayName:
+#       type: string
+#       description: "Display name in Grafana"
+#     folder:
+#       type: string
+#       description: "Folder in Grafana where the dashboard where live"
+#     dashboardJSONFile:
+#       type: string
+#       description: "Path to JSON Grafana dashboard"
+# @schema
+# -- List of Grafana dashboards
+dashboards: []

@@ -30,6 +30,10 @@ tasks:
     cmds:
       - task: app
 
+  pre-commit:
+    cmds:
+      - pre-commit run --all
+
   clean:
     aliases: [delete]
     ignore_error: true
@@ -527,14 +531,19 @@ tasks:
     vars:
       NAMESPACE: grafana
     cmds:
-      - helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards -f deploy/infrastructure/grafana/dashboards/values.yaml --namespace {{.NAMESPACE}}
+      - |
+        helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards \
+          -f deploy/infrastructure/grafana/dashboards/values.yaml \
+          -f deploy/infrastructure/grafana/dashboards/env/playground.values.yaml \
+          --namespace {{.NAMESPACE}}
     status:
       - |
         helm template deploy/infrastructure/grafana/dashboards --name-template=grafana-dashboards \
           --namespace {{.NAMESPACE}} \
           --is-upgrade \
           --no-hooks \
-          -f deploy/infrastructure/grafana/dashboards/values.yaml | kubectl diff -f - -n {{.NAMESPACE}}
+          -f deploy/infrastructure/grafana/dashboards/values.yaml \
+          -f deploy/infrastructure/grafana/dashboards/env/playground.values.yaml | kubectl diff -f - -n {{.NAMESPACE}}
 
   infra:grafana:dashboards:clean:
     run: once
