@@ -8,6 +8,10 @@ A Helm chart for deploying a lot of Grafana Dashboards
 
 This is deployed via the root taskfile.
 
+## Schema
+
+This chart uses [helm-schema](https://github.com/dadav/helm-schema) for generating the `values.schema.json`.
+
 ## Values
 
 | Key | Type | Default | Description |
