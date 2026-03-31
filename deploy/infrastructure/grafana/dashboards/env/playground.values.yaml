@@ -4,3 +4,7 @@ dashboards:
     displayName: Argo Rollouts Overview
     folder: Argo Rollouts
     dashboardJSONFile: argo-rollouts-overview.json
+  - name: echo-overview
+    displayName: Echo Overview
+    folder: Echo
+    dashboardJSONFile: echo-overview.json

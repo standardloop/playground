@@ -2,7 +2,7 @@
 version: '3'
 
 silent: true
-runs: once
+run: once
 
 dotenv: ['.env']
 
@@ -49,7 +49,6 @@ tasks:
 
   # DOCKER ENGINE START
   docker-engine:test:
-    runs: once
     requires:
       vars:
         - name: DOCKER_ENGINE
@@ -67,7 +66,6 @@ tasks:
 
   docker-engine:start:
     aliases: [docker-engine:run]
-    runs: once
     requires:
       vars:
         - name: DOCKER_ENGINE
@@ -166,7 +164,6 @@ tasks:
   kind:
     silent: true
     aliases: ["cluster"]
-    run: once
     deps:
       - docker-engine:start
     cmds:
@@ -182,7 +179,6 @@ tasks:
         {{end}}
 
   kind:create:
-    run: once
     silent: true
     deps:
       - docker-engine:start
@@ -217,7 +213,6 @@ tasks:
         fi
 
   kind:cloud-provider:run:
-    run: once
     silent: true
     deps:
       - kind:create
@@ -287,7 +282,6 @@ tasks:
 
   ## FLUX START
   infra:flux:install:
-    run: once
     deps:
       - kind
     cmds:
@@ -305,7 +299,6 @@ tasks:
 
   ## SOURCES START
   infra:sources:install:
-    run: once
     deps:
       - infra:flux:install
     cmds:
@@ -331,7 +324,6 @@ tasks:
 
   ## ISTIO START
   infra:istio:install:
-    run: once
     deps:
       - infra:sources:install
     cmds:
@@ -340,7 +332,6 @@ tasks:
       # - task: infra:istio:update-etc-hosts
 
   infra:istio:base:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -352,7 +343,6 @@ tasks:
       - kubectl diff -k deploy/infrastructure/istio/base
 
   infra:istio:gateway:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -376,7 +366,6 @@ tasks:
       - kubectl diff -k deploy/infrastructure/istio/gateway
 
   infra:istio:update-etc-hosts:
-    run: once
     prompt: Do you want to update /etc/hosts ?
     silent: true
     deps:
@@ -399,7 +388,6 @@ tasks:
 
   ## KUBE_PROM_STACK START
   infra:kube-prom-stack:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -409,14 +397,12 @@ tasks:
       - kubectl diff -k deploy/infrastructure/kube-prom-stack
 
   infra:kube-prom-stack:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/kube-prom-stack
   ## KUBE_PROM_STACK END
 
   ## ARGO_ROLLOUTS START
   infra:argo-rollouts:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -426,14 +412,12 @@ tasks:
       - kubectl diff -k deploy/infrastructure/argo-rollouts
 
   infra:argo-rollouts:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/argo-rollouts
   ## ARGO_ROLLOUTS END
 
   ## HEADLAMP START
   infra:headlamp:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -451,21 +435,18 @@ tasks:
       - kubectl create token headlamp-admin -n kube-system | pbcopy
 
   infra:headlamp:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/headlamp
   ## HEADLAMP END
 
   ## GRAFANA START
   infra:grafana:install:
-    run: once
     cmds:
       - task: infra:grafana:operator:install
       - task: infra:grafana:instance:install
       - task: infra:grafana:dashboards:install
 
   infra:grafana:clean:
-    run: once
     cmds:
       - task: infra:grafana:dashboards:clean
       - task: infra:grafana:instance:clean
@@ -473,7 +454,6 @@ tasks:
 
   ### GRAFANA OPERATOR START
   infra:grafana:operator:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -483,12 +463,10 @@ tasks:
       - kubectl diff -k deploy/infrastructure/grafana/operator
 
   infra:grafana:operator:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/grafana/operator
   ### GRAFANA INSTANCE START
   infra:grafana:instance:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -503,13 +481,11 @@ tasks:
       - kubectl diff -k deploy/infrastructure/grafana/instance
 
   infra:grafana:instance:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/grafana/instance
   ### GRAFANA INSTANCE END
   ### GRAFANA DASHBOARDS START
   infra:grafana:dashboards:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -534,7 +510,6 @@ tasks:
           -f deploy/infrastructure/grafana/dashboards/env/playground.values.yaml | kubectl diff -f - -n {{.NAMESPACE}}
 
   infra:grafana:dashboards:clean:
-    run: once
     cmds:
       - helm delete grafana-dashboards -n grafana
   ### GRAFANA DASHBOARDS END
@@ -542,7 +517,6 @@ tasks:
 
   ## HOMER START
   infra:homer:install:
-    run: once
     deps:
       - infra:flux:install
       - infra:sources:install
@@ -553,7 +527,6 @@ tasks:
       - kubectl diff -k deploy/infrastructure/homer
 
   infra:homer:clean:
-    run: once
     cmds:
       - kubectl delete -k deploy/infrastructure/homer
   ## HOMER END
