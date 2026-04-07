@@ -14,3 +14,11 @@ $ task
 ```sh
 $ task clean
 ```
+
+## Mise
+
+```sh
+$ mise install
+...
+$ mise uninstall --all
+```

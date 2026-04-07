@@ -1,0 +1,14 @@
+[settings]
+lockfile = true
+
+[tools]
+task = "latest"
+
+kind = "latest"
+colima = "latest"
+rancher = "latest"
+
+kubectl = "latest"
+helm = "latest"
+tilt = "latest"
+flux2 = "latest"

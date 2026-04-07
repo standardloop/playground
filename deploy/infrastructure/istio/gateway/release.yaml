@@ -34,3 +34,8 @@ spec:
   values:
     service:
       type: "ClusterIP"
+      # ports:
+      #   - name: http-envoy-prom
+      #     port: 15020
+      #     protocol: TCP
+      #     targetPort: 15020

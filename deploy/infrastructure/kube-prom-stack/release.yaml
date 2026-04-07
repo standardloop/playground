@@ -60,7 +60,7 @@ spec:
       prometheusSpec:
         serviceMonitorSelector:
           matchLabels:
-            release: kube-prometheus-stack
+            prometheus: kube-prometheus-stack
         podMonitorSelector:
           matchLabels:
-            release: kube-prometheus-stack
+            prometheus: kube-prometheus-stack

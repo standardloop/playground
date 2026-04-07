@@ -1,0 +1,37 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: istio-gateway
+  namespace: kube-prometheus-stack
+  labels:
+    prometheus: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - istio-gateway
+  selector:
+    matchLabels:
+      istio: gateway
+  podMetricsEndpoints:
+    - port: http-envoy-prom
+      path: /stats/prometheus
+      interval: 15s
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: istio-gateway
+#   labels:
+#     prometheus: kube-prometheus-stack
+# spec:
+#   namespaceSelector:
+#     matchNames:
+#       - istio-gateway
+#   selector:
+#     matchLabels:
+#       istio: gateway
+#   endpoints:
+#     - port: http-envoy-prom
+#       path: /stats/prometheus
+#       interval: 15s
