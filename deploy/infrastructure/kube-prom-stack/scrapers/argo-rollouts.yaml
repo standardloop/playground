@@ -1,0 +1,19 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: argo-rollouts
+  namespace: kube-prometheus-stack
+  labels:
+    prometheus: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - argo-rollouts
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rollouts-controller
+      app.kubernetes.io/instance: argo-rollouts
+      app.kubernetes.io/name: argo-rollouts
+  endpoints:
+    - port: metrics
