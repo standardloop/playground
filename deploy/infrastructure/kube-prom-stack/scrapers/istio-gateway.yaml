@@ -3,7 +3,6 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: istio-gateway
-  namespace: kube-prometheus-stack
   labels:
     prometheus: kube-prometheus-stack
 spec:

@@ -8,3 +8,7 @@ dashboards:
     displayName: Echo Overview
     folder: Echo
     dashboardJSONFile: echo-overview.json
+  - name: istio-overview
+    displayName: Istio Overview
+    folder: Istio
+    dashboardJSONFile: istio-overview.json

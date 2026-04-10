@@ -5,7 +5,7 @@ metadata:
   name: homer-to-home-redirect
 spec:
   gateways:
-    - istio-gateway/playground-local-gateway
+    - playground-local-gateway
   hosts:
     - "homer.playground.local"
   http:
@@ -19,7 +19,7 @@ metadata:
   name: homer
 spec:
   gateways:
-    - istio-gateway/playground-local-gateway
+    - playground-local-gateway
   hosts:
     - "home.playground.local"
   http:

@@ -7,7 +7,7 @@ spec:
   hosts:
   - "headlamp.playground.local"
   gateways:
-  - istio-gateway/playground-local-gateway
+  - playground-local-gateway
   http:
   - match:
     - uri:
