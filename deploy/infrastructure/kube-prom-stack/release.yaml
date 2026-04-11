@@ -27,6 +27,9 @@ spec:
   driftDetection:
     mode: disabled
   values:
+    commonLabels:
+      prometheus: kube-prometheus-stack
+      environment: playground
     alertmanager:
       enabled: false
     grafana:
