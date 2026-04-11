@@ -28,6 +28,6 @@ spec:
     mode: disabled
   values:
     serviceMonitor:
-      enabled: true
+      enabled: false
       additionalLabels:
         prometheus: kube-prometheus

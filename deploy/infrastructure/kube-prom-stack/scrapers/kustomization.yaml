@@ -8,6 +8,7 @@ resources:
   - istio-gateway.yaml
   - istiod.yaml
   - argo-rollouts.yaml
+  - grafana-operator.yaml
 
 labels:
   - pairs:

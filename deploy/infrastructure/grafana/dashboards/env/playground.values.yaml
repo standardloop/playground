@@ -12,3 +12,7 @@ dashboards:
     displayName: Istio Overview
     folder: Istio
     dashboardJSONFile: istio-overview.json
+  - name: prometheus-overview
+    displayName: Prometheus Overview
+    folder: Monitoring
+    dashboardJSONFile: prometheus-overview.json
