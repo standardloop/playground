@@ -49,3 +49,8 @@ spec:
         podMonitorSelector:
           matchLabels:
             prometheus: kube-prometheus-stack
+    kube-state-metrics:
+      prometheus:
+        monitor:
+          additionalLabels:
+            prometheus: kube-prometheus-stack
