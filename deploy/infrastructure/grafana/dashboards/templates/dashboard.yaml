@@ -14,5 +14,5 @@ spec:
       dashboards: grafana
   folder: {{ .folder }}
   json: >
-{{- $.Files.Get (printf "dashboards/%s" .dashboardJSONFile) | nindent 4 }}
+{{- $.Files.Get (printf "json/%s" .dashboardJSONFile) | nindent 4 }}
 {{- end -}}

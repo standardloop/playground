@@ -37,11 +37,6 @@ spec:
     prometheus:
       ingress:
         enabled: false
-        # ingressClassName: nginx
-        # # annotations:
-        # hosts:
-        #   - prometheus.local
-        # path: /
       prometheusSpec:
         serviceMonitorSelector:
           matchLabels:
