@@ -2,8 +2,9 @@ package server
 
 import (
 	"api-std/config"
+	"api-std/server/handlers"
 	v1 "api-std/server/handlers/api/v1"
-	"api-std/server/handlers/health"
+	"api-std/server/handlers/api/v1/health"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -11,10 +12,9 @@ import (
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		slog.Info(r.URL.Path)
-		// Call the next handler in the chain
+
 		next.ServeHTTP(w, r)
-		// log.Printf("Finished request: %s %s in %v", r.Method, r.URL.Path, time.Since(start))
+		slog.Info(r.URL.Path)
 	})
 }
 
@@ -22,14 +22,18 @@ func Init() {
 	mainMux := http.NewServeMux()
 	apiMux := http.NewServeMux()
 
-	apiMux.HandleFunc("/", http.HandlerFunc(v1.NotFoundHandler))
+	apiMux.HandleFunc("/", http.HandlerFunc(handlers.GenericNotFoundHandler))
 	apiMux.Handle("GET /env", loggingMiddleware(http.HandlerFunc(v1.EnvHandler)))
+	apiMux.Handle("GET /health/simple", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
+	apiMux.Handle("GET /health/postgres", loggingMiddleware(http.HandlerFunc(health.PostgresHealthHandler)))
+
+	// todo
+	apiMux.Handle("GET /health/intergrations", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
+	apiMux.Handle("GET /health/mysql", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
+	apiMux.Handle("GET /health/mongo", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
 
 	mainMux.Handle(config.ApiVersion+"/", http.StripPrefix(config.ApiVersion, apiMux))
-
-	mainMux.Handle("/health", loggingMiddleware(http.HandlerFunc(health.HealthHandler)))
-
-	//mainMux.NotFound = loggingMiddleware(http.HandlerFunc(handlers.NotFoundHandler))
+	mainMux.HandleFunc("/", http.HandlerFunc(handlers.GenericNotFoundHandler))
 
 	http.ListenAndServe(fmt.Sprintf(":%s", config.Env.AppPort), mainMux)
 }

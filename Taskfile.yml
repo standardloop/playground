@@ -40,7 +40,7 @@ tasks:
     silent: true
     cmds:
       - task: kind:clean
-      - task: compose:clean
+      # - task: compose:clean
       - task: docker-engine:clean
 
   print:
@@ -116,26 +116,26 @@ tasks:
         task: rancher:clean
   # DOCKER ENGINE END
 
-  # COMPOSE START
-  compose:start:
-    silent: true
-    preconditions:
-      - docker info > /dev/null 2>&1
-    deps:
-      - docker-engine:start
-    cmds:
-      - docker compose up -d
+  # # COMPOSE START
+  # compose:start:
+  #   silent: true
+  #   preconditions:
+  #     - docker info > /dev/null 2>&1
+  #   deps:
+  #     - docker-engine:start
+  #   cmds:
+  #     - docker compose up -d
 
-  compose:clean:
-    silent: true
-    cmds:
-      - |
-        if docker info > /dev/null 2>&1; then
-          docker compose down
-        else
-          echo "{{.TEXT_GRAY}}docker is not running so no compose to clean right now{{.TEXT_RESET}}"
-        fi
-  # COMPOSE END
+  # compose:clean:
+  #   silent: true
+  #   cmds:
+  #     - |
+  #       if docker info > /dev/null 2>&1; then
+  #         docker compose down
+  #       else
+  #         echo "{{.TEXT_GRAY}}docker is not running so no compose to clean right now{{.TEXT_RESET}}"
+  #       fi
+  # # COMPOSE END
 
   # HELPER START
   wait-for-crd:

@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"log/slog"
 	"os"
 	"reflect"
 	"strconv"
@@ -19,7 +20,7 @@ type config struct {
 	MySQLPass    string `json:"mySQLPass" env:"MYSQL_PASS" envDefault:"mypassword"`
 	MySQLDBName  string `json:"mySQLDBName" env:"MYSQL_DBNAME" envDefault:"playground"`
 
-	PostgresEnabled bool   `json:"postgresEnabled" env:"POSTGRES_ENABLED" envDefault:"false"`
+	PostgresEnabled bool   `json:"postgresEnabled" env:"POSTGRES_ENABLED" envDefault:"true"`
 	PostgresHost    string `json:"postgresHost" env:"POSTGRES_HOST" envDefault:"localhost"`
 	PostgresPort    string `json:"postgresPort" env:"POSTGRES_PORT" envDefault:"5432"`
 	PostgresUser    string `json:"postgresUser" env:"POSTGRES_USER" envDefault:"root"`
@@ -76,8 +77,12 @@ func initEnvironment() config {
 	return cfg
 }
 
-func (conf config) String() string {
-	jsonData, _ := json.Marshal(conf)
+func (conf config) JSON() string {
+	jsonData, err := json.Marshal(conf)
+	if err != nil {
+		slog.Error("Error converting env to json")
+		return ""
+	}
 	return string(jsonData)
 }
 

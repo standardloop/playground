@@ -1,8 +1,10 @@
 package main
 
 import (
+	"api-std/config"
 	"api-std/integrations/postgres"
 	"api-std/logging"
+	"api-std/server"
 	"log/slog"
 )
 
@@ -14,7 +16,9 @@ func main() {
 	logging.Init()
 	slog.Error("Starting up!")
 
-	postgres.JoshTest2()
+	if config.Env.PostgresEnabled {
+		postgres.PostgresPoolInit()
+	}
 
-	//server.Init()
+	server.Init()
 }

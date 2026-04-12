@@ -43,5 +43,3 @@ deploy/apps/mysql/
 TODO.yaml
 *.sh
 archive
-
-src/api-std
