@@ -21,6 +21,8 @@ services:
       MYSQL_ROOT_PASSWORD: mypassword
     ports:
       - 3306:3306
+    volumes:
+      - ./init.mysql.sql:/docker-entrypoint-initdb.d/init.sql
     # profiles: [ "db" ]
   postgresdb:
     image: postgres:latest

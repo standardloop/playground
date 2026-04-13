@@ -13,7 +13,7 @@ type config struct {
 	AppPort  string `json:"appPort" env:"APPLICATION_PORT" envDefault:"8080"`
 	LogLevel string `json:"logLevel" env:"LOG_LEVEL" envDefault:"INFO"`
 
-	MySQLEnabled bool   `json:"mySQLEnabled" env:"MYSQL_ENABLED" envDefault:"false"`
+	MySQLEnabled bool   `json:"mySQLEnabled" env:"MYSQL_ENABLED" envDefault:"true"`
 	MySQLHost    string `json:"mySQLHost" env:"MYSQL_HOST" envDefault:"localhost"`
 	MySQLPort    string `json:"mySQLPort" env:"MYSQL_PORT" envDefault:"3306"`
 	MySQLUser    string `json:"mySQLUser" env:"MYSQL_USER" envDefault:"root"`
