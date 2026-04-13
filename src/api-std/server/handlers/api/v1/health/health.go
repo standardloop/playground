@@ -1,6 +1,8 @@
 package health
 
 import (
+	"api-std/integrations/mongo"
+	"api-std/integrations/mysql"
 	"api-std/integrations/postgres"
 	"encoding/json"
 	"net/http"
@@ -20,10 +22,44 @@ func BasicHealthHandler(w http.ResponseWriter, r *http.Request) {
 func PostgresHealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	postgresHealthy := postgres.PostgresPoolPing()
-	if !postgresHealthy {
+	err := postgres.PostgresPoolPing()
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Cannot connect to Postgres"})
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+	} else {
+		response := map[string]string{"status": "healthy"}
+
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func MYSQLHealthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	err := mysql.MySQLPoolPing()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+	} else {
+		response := map[string]string{"status": "healthy"}
+
+		err := json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
+func MongoHealthHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	err := mongo.MongoPoolPing()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 	} else {
 		response := map[string]string{"status": "healthy"}
 

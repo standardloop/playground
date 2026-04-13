@@ -2,12 +2,12 @@ package main
 
 import (
 	"api-std/config"
+	"api-std/integrations/mongo"
 	"api-std/integrations/mysql"
 	"api-std/integrations/postgres"
 	"api-std/logging"
 	"api-std/server"
 	"log/slog"
-	"os"
 )
 
 //	func handler(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +25,10 @@ func main() {
 	if config.Env.MySQLEnabled {
 		mysql.MySQLPoolInit()
 	}
-	os.Exit(0)
+
+	if config.Env.MongoEnabled {
+		mongo.MongoPoolInit()
+	}
 
 	server.Init()
 }

@@ -26,11 +26,12 @@ func Init() {
 	apiMux.Handle("GET /env", loggingMiddleware(http.HandlerFunc(v1.EnvHandler)))
 	apiMux.Handle("GET /health/simple", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
 	apiMux.Handle("GET /health/postgres", loggingMiddleware(http.HandlerFunc(health.PostgresHealthHandler)))
+	apiMux.Handle("GET /health/mysql", loggingMiddleware(http.HandlerFunc(health.MYSQLHealthHandler)))
+	apiMux.Handle("GET /health/mongo", loggingMiddleware(http.HandlerFunc(health.MongoHealthHandler)))
 
 	// todo
 	apiMux.Handle("GET /health/intergrations", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
-	apiMux.Handle("GET /health/mysql", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
-	apiMux.Handle("GET /health/mongo", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
+
 
 	mainMux.Handle(config.ApiVersion+"/", http.StripPrefix(config.ApiVersion, apiMux))
 	mainMux.HandleFunc("/", http.HandlerFunc(handlers.GenericNotFoundHandler))

@@ -33,12 +33,12 @@ func MySQLPoolInit() {
 	MySQLPool = pool
 }
 
-func MySQLPoolPing() bool {
+func MySQLPoolPing() error {
 	if err := MySQLPool.Ping(); err != nil {
 		slog.Error(err.Error())
-		return false
+		return err
 	}
-	return true
+	return nil
 }
 
 var MySQLPool *sql.DB = nil

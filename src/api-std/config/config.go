@@ -27,7 +27,7 @@ type config struct {
 	PostgresPass    string `json:"postgresPass" env:"POSTGRES_PASS" envDefault:"mypassword"`
 	PostgresDBName  string `json:"postgresDBName" env:"POSTGRES_DBNAME" envDefault:"playground"`
 
-	MongoEnabled bool   `json:"mongoEnabled" env:"MONGO_ENABLED" envDefault:"false"`
+	MongoEnabled bool   `json:"mongoEnabled" env:"MONGO_ENABLED" envDefault:"true"`
 	MongoHost    string `json:"mongoHost" env:"MONGO_HOST" envDefault:"localhost"`
 	MongoPort    string `json:"mongoPort" env:"MONGO_PORT" envDefault:"27017"`
 	MongoUser    string `json:"mongoUser" env:"MONGO_USER" envDefault:"root"`

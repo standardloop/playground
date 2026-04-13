@@ -3,6 +3,7 @@ package postgres
 import (
 	"api-std/config"
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -24,7 +25,6 @@ func PostgresPoolInit() {
 		slog.Error("Unable to create connection pool: %v", err)
 		return
 	}
-	//defer pool.Close()
 
 	// Use a timeout to avoid hanging if the database is down.
 	pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -39,9 +39,9 @@ func PostgresPoolInit() {
 	PostgresPool = pool
 }
 
-func PostgresPoolPing() bool {
+func PostgresPoolPing() error {
 	if PostgresPool == nil {
-		return false
+		return errors.New("PostgresPool is nil")
 	}
 	ctx := context.Background()
 
@@ -49,10 +49,9 @@ func PostgresPoolPing() bool {
 	defer cancel()
 	if err := PostgresPool.Ping(pingCtx); err != nil {
 		slog.Error("Could not ping database: %v", err)
-		return false
+		return err
 	}
-	return true
-
+	return nil
 }
 
 var PostgresPool *pgxpool.Pool = nil
