@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: kiali
+
+resources:
+  - namespace.yaml
+  - instance.yaml
+
+labels:
+  - pairs:
+      environment: playground
+    # includeSelectors: true  # Updates matchLabels/selectors
+    # includeTemplates: true  # Updates pod template labels

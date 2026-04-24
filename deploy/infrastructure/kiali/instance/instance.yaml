@@ -1,0 +1,56 @@
+---
+apiVersion: kiali.io/v1alpha1
+kind: Kiali
+metadata:
+  name: kiali
+spec:
+  auth:
+    strategy: anonymous
+  deployment:
+    cluster_wide_access: true
+    image_digest: ""
+    image_pull_policy: IfNotPresent
+    instance_name: kiali
+    remote_cluster_resources_only: false
+    replicas: 1
+    secret_name: kiali
+    view_only_mode: false
+  version: default
+  external_services:
+    prometheus:
+      url: "http://kube-prometheus-stack-prometheus.kube-prometheus-stack:9090"
+    istio:
+      gateway_api_classes:
+        - name: "Kind"
+          class_name: "cloud-provider-kind"
+    grafana:
+      auth:
+        insecure_skip_verify: false
+        password: playground
+        token: ""
+        type: "none"
+        use_kiali_token: false
+        username: playground
+      # dashboards:
+      # - name: "Istio Service Dashboard"
+      #   variables:
+      #     datasource: "var-datasource"
+      #     namespace: "var-namespace"
+      #     service: "var-service"
+      #     version: "var-version"
+      # - name: "Istio Workload Dashboard"
+      #   variables:
+      #     datasource: "var-datasource"
+      #     namespace: "var-namespace"
+      #     workload: "var-workload"
+      #     version: "var-version"
+      # - name: "Istio Mesh Dashboard"
+      # - name: "Istio Control Plane Dashboard"
+      # - name: "Istio Performance Dashboard"
+      # - name: "Istio Wasm Extension Dashboard"
+      datasource_uid: ""
+      enabled: true
+      external_url: "http://grafana.playground.local"
+      health_check_url: ""
+      internal_url: "http://grafana-service.grafana:3000"
+      is_core: false

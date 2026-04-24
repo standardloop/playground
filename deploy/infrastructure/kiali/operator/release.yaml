@@ -27,9 +27,3 @@ spec:
   driftDetection:
     mode: disabled
   values:
-    cr:
-      create: true
-      namespace: istio-system
-      spec:
-        auth:
-          strategy: "anonymous"

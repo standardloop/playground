@@ -271,6 +271,7 @@ tasks:
       - infra:homer:install
       - infra:grafana:install
       - infra:argo-rollouts:install
+      - infra:kiali:install
 
   infra:clean:
     deps:
@@ -281,6 +282,7 @@ tasks:
       - task: infra:headlamp:clean
       - task: infra:homer:clean
       - task: infra:grafana:clean
+      - task: infra:kiali:clean
 
   ## FLUX START
   infra:flux:install:
@@ -387,18 +389,53 @@ tasks:
       LOAD_BALANCER_IP:
         sh: kubectl get gateway/playground-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
 
-  infra:istio:kiali:install:
+  ## ISTIO END
+
+  ## KIALI START
+  infra:kiali:install:
     deps:
       - infra:flux:install
       - infra:sources:install
-      - infra:istio:base:install
     cmds:
-      - kubectl apply -k deploy/infrastructure/kiali
-      - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
-    status:
-      - kubectl diff -k deploy/infrastructure/kiali
+      - task: infra:kiali:operator:install
+      - task: infra:kiali:instance:install
 
-  ## ISTIO END
+  infra:kiali:operator:install:
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/kiali/operator
+    status:
+      - kubectl diff -k deploy/infrastructure/kiali/operator
+
+  infra:kiali:operator:clean:
+    cmds:
+      - kubectl delete -k deploy/infrastructure/kiali/operator
+
+  infra:kiali:instance:install:
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:kiali:operator:install
+      - task: wait-for-crd
+        vars: { CRD: "kialis.kiali.io" }
+    cmds:
+      - kubectl apply -k deploy/infrastructure/kiali/instance
+    status:
+      - kubectl diff -k deploy/infrastructure/kiali/instance
+
+  infra:kiali:instance:clean:
+    cmds:
+      - kubectl delete -k deploy/infrastructure/kiali/instance
+
+  infra:kiali:clean:
+    cmds:
+      - task: infra:kiali:instance:clean
+      - task: infra:kiali:operator:clean
+
+
+  ## KIALI END
 
   ## KUBE_PROM_STACK START
   infra:kube-prom-stack:install:
