@@ -152,6 +152,15 @@ data:
             url: "http://headlamp.playground.local"
             type: "Ping"
             target: "_blank" # optional html tag target attribute
+          - name: "Kiali"
+            icon: "fa-regular fa-circle"
+            # logo: "https://kiali.io/favicons/favicon-32x32.png"
+            subtitle: "The Console for Istio Service Mesh"
+            tag: "infra"
+            keywords: "Kiali"
+            url: "http://kiali.playground.local"
+            type: "Ping"
+            target: "_blank" # optional html tag target attribute
       - name: "Applications"
         icon: "fas fa-rocket"
         # A path to an image can also be provided. Note that icon take precedence if both icon and logo are set.

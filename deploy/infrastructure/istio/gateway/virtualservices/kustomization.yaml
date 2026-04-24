@@ -8,3 +8,4 @@ resources:
   - homer.yaml
   - prometheus.yaml
   - rollouts.yaml
+  - kiali.yaml

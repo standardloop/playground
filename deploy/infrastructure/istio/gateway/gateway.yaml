@@ -21,3 +21,4 @@ spec:
         - "headlamp.playground.local"
         - "homer.playground.local"
         - "home.playground.local"
+        - "kiali.playground.local"

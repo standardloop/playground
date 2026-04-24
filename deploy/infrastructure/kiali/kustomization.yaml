@@ -2,16 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: flux-system
+namespace: kiali-operator
 
 resources:
-  - metrics-server.yaml
-  - istio.yaml
-  - prometheus-community.yaml
-  - argo.yaml
-  - headlamp.yaml
-  - grafana-operator.yaml
-  - kiali.yaml
+  - namespace.yaml
+  - release.yaml
 
 labels:
   - pairs:

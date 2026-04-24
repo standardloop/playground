@@ -386,6 +386,18 @@ tasks:
     vars:
       LOAD_BALANCER_IP:
         sh: kubectl get gateway/playground-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
+
+  infra:istio:kiali:install:
+    deps:
+      - infra:flux:install
+      - infra:sources:install
+      - infra:istio:base:install
+    cmds:
+      - kubectl apply -k deploy/infrastructure/kiali
+      - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
+    status:
+      - kubectl diff -k deploy/infrastructure/kiali
+
   ## ISTIO END
 
   ## KUBE_PROM_STACK START

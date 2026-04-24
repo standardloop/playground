@@ -5,6 +5,7 @@ import (
 	"api-std/integrations/mongo"
 	"api-std/integrations/mysql"
 	"api-std/integrations/postgres"
+	"api-std/integrations/redis"
 	"api-std/logging"
 	"api-std/server"
 	"log/slog"
@@ -28,6 +29,10 @@ func main() {
 
 	if config.Env.MongoEnabled {
 		mongo.MongoPoolInit()
+	}
+
+	if config.Env.RedisEnabled {
+		redis.RedisPoolInit()
 	}
 
 	server.Init()

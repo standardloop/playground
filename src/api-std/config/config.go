@@ -34,6 +34,12 @@ type config struct {
 	MongoPass    string `json:"mongoPass" env:"MONGO_PASS" envDefault:"mypassword"`
 	MongoDBName  string `json:"mongoDBName" env:"MONGO_DBNAME" envDefault:"playground"`
 
+	RedisEnabled bool   `json:"redisEnabled" env:"REDIS_ENABLED" envDefault:"true"`
+	RedisHost    string `json:"redisHost" env:"REDIS_HOST" envDefault:"localhost"`
+	RedisPort    string `json:"redisPort" env:"REDIS_PORT" envDefault:"6379"`
+	RedisPass    string `json:"redisPass" env:"REDIS_PASS" envDefault:"mypassword"`
+	RedisDBNum   string `json:"redisDBNum" env:"REDIS_DB_NUM" envDefault:"0"`
+
 	ShortSha string `json:"shortsha" env:"SHORT_SHA" envDefault:"12345678"`
 	GitTag   string `json:"tag" env:"GIT_TAG" envDefault:"v1.0.0"`
 }
