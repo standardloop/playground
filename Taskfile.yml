@@ -181,18 +181,12 @@ tasks:
   #         cat "{{.}}" | yq .name
   #       {{end}}
 
-  kind:setup:
-    deps:
-      - docker-engine:start
-    cmds:
-      - ./kind/local-registry-setup.sh
-
   kind:create:
     silent: true
     deps:
       - docker-engine:start
-      - kind:setup
     cmds:
+      - ./kind/local-registry-setup.sh
       - kind create cluster --config=kind/slke-1.yaml
       - ./kind/local-registry-finish.sh
     status:

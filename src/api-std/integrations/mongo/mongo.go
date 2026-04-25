@@ -41,7 +41,7 @@ func MongoPoolInit() {
 		slog.Error(err.Error())
 		return
 	}
-	slog.Info("successfully connected to mongodb")
+	slog.Info("MongoDB Pool has been successfully initialized")
 	MongoPool = mongoClient
 }
 

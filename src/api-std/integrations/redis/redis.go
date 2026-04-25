@@ -30,6 +30,7 @@ func RedisPoolInit() {
 		slog.Error("Could not connect to Redis: %v", err)
 		return
 	}
+	slog.Info("RedisPool has been succesfully initalized")
 	RedisPool = redisPool
 }
 

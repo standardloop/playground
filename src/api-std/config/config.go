@@ -40,6 +40,8 @@ type config struct {
 	RedisPass    string `json:"redisPass" env:"REDIS_PASS" envDefault:"mypassword"`
 	RedisDBNum   string `json:"redisDBNum" env:"REDIS_DB_NUM" envDefault:"0"`
 
+	// ElasticEnabled bool `json:"elasticEnabled" env:"ELASTIC_ENABLED" envDefault:"true"`
+
 	ShortSha string `json:"shortsha" env:"SHORT_SHA" envDefault:"12345678"`
 	GitTag   string `json:"tag" env:"GIT_TAG" envDefault:"v1.0.0"`
 }
