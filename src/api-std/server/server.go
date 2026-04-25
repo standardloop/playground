@@ -50,7 +50,9 @@ func Init() {
 	apiMux.Handle("GET /health/intergrations", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
 
 	mainMux.Handle(config.ApiVersion+"/", http.StripPrefix(config.ApiVersion, apiMux))
-	mainMux.HandleFunc("/status/{code}", http.HandlerFunc(handlers.StatusHandler))
+	mainMux.HandleFunc("GET /crash", http.HandlerFunc(handlers.CrashHandler))
+	mainMux.HandleFunc("GET /crash/{code}", http.HandlerFunc(handlers.CrashCodeHandler))
+	mainMux.HandleFunc("GET /status/{code}", http.HandlerFunc(handlers.StatusHandler))
 	mainMux.HandleFunc("/", http.HandlerFunc(handlers.GenericNotFoundHandler))
 
 	http.ListenAndServe(fmt.Sprintf(":%s", config.Env.AppPort), mainMux)
