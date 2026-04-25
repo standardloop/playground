@@ -285,11 +285,11 @@ tasks:
       - infra:istio:install
       - infra:metrics-server:install
       - infra:kube-prom-stack:install
-      #- infra:headlamp:install
+      # - infra:headlamp:install
       - infra:homer:install
-      #- infra:grafana:install
+      # - infra:grafana:install
       - infra:argo-rollouts:install
-      #- infra:kiali:install
+      # - infra:kiali:install
 
   infra:clean:
     deps:
