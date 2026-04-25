@@ -1,30 +1,39 @@
 package main
 
 import (
-	"api/config"
-	"api/database/dbmongo"
-	"api/database/dbmysql"
-	"api/database/dbpostgres"
-	"api/logging"
-	"api/server"
-
-	"github.com/rs/zerolog/log"
+	"api-std/config"
+	"api-std/integrations/mongo"
+	"api-std/integrations/mysql"
+	"api-std/integrations/postgres"
+	"api-std/integrations/redis"
+	"api-std/logging"
+	"api-std/server"
+	"log/slog"
 )
 
+//	func handler(w http.ResponseWriter, r *http.Request) {
+//		fmt.Fprintf(w, "Hello, World!")
+//	}
+
 func main() {
-
 	logging.Init()
-	log.Trace().Msg("Starting main()")
-	if config.Env.MySQLEnabled {
-		dbmysql.Init()
-	}
+	slog.Error("Starting up!")
+
 	if config.Env.PostgresEnabled {
-		dbpostgres.Init()
-	}
-	if config.Env.MongoEnabled {
-		dbmongo.Init()
+		postgres.PostgresPoolInit()
 	}
 
-	log.Debug().Msg("initializing server")
+	if config.Env.MySQLEnabled {
+		mysql.MySQLPoolInit()
+	}
+
+	if config.Env.MongoEnabled {
+		mongo.MongoPoolInit()
+	}
+
+	if config.Env.RedisEnabled {
+		redis.RedisPoolInit()
+	}
+
 	server.Init()
 }

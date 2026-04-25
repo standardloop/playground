@@ -1,35 +1,28 @@
 package logging
 
 import (
-	"api/config"
-
-	"github.com/rs/zerolog"
+	"api-std/config"
+	"log/slog"
+	"os"
 )
 
 func Init() {
+	var logLevel slog.LevelVar
+
 	switch config.Env.LogLevel {
-	case "PANIC":
-		zerolog.SetGlobalLevel(zerolog.PanicLevel)
-		break
-	case "FATAL":
-		zerolog.SetGlobalLevel(zerolog.FatalLevel)
-		break
 	case "ERROR":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		break
+		logLevel.Set(slog.LevelError)
 	case "WARN":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		break
-	case "INFO":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		break
+		logLevel.Set(slog.LevelWarn)
 	case "DEBUG":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		break
-	case "TRACE":
-		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		break
+		logLevel.Set(slog.LevelDebug)
+	case "INFO":
+		logLevel.Set(slog.LevelInfo)
 	default:
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		logLevel.Set(slog.LevelInfo)
 	}
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: &logLevel,
+	}))
+	slog.SetDefault(logger)
 }

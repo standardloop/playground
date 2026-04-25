@@ -1,3 +1,5 @@
 package config
 
-var ApiVersion = "/api/v1"
+const (
+	ApiVersion = "/v1"
+)
