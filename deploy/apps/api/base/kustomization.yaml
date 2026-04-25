@@ -7,7 +7,7 @@ resources:
   - configmap.yaml
   - service.yaml
   - ksa.yaml
-  - servicemonitor.yaml
-  - vs.yaml
+  # - servicemonitor.yaml
+  # - vs.yaml
   - hpa.yaml
-  - envoy-filter.yaml
+  # - envoy-filter.yaml

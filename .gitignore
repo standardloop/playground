@@ -22,9 +22,7 @@ INFO.md
 run.txt
 info.txt
 argocd/notes.txt
-kbuild.sh
 deploy/api/dev.yaml
-install_argo.sh
 foo.yaml
 src/ui/node_modules
 playground
@@ -41,5 +39,4 @@ deploy/apps/mongo/
 deploy/apps/mysql/
 .Makefile
 TODO.yaml
-*.sh
 archive

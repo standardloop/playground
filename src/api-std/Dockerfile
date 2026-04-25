@@ -1,4 +1,4 @@
-FROM golang:1.26-buster
+FROM golang:1.26-trixie
 
 RUN export GO111MODULE=on
 ENV GO111MODULE=on

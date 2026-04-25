@@ -1,6 +1,7 @@
 package health
 
 import (
+	"api-std/config"
 	"api-std/integrations/mongo"
 	"api-std/integrations/mysql"
 	"api-std/integrations/postgres"
@@ -12,7 +13,7 @@ import (
 func BasicHealthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	response := map[string]string{"status": "healthy"}
+	response := map[string]string{"status": "healthy", "short_sha": config.Env.ShortSha, "tag": config.Env.GitTag}
 	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

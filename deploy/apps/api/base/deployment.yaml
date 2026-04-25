@@ -19,7 +19,7 @@ spec:
       serviceAccountName: api
       containers:
         - name: api
-          image: api:0.0.1
+          image: localhost:5001/api:0.0.1
           envFrom:
             - configMapRef:
                 name: api

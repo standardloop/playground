@@ -25,3 +25,12 @@ data:
   MONGO_USER: "root"
   MONGO_PASS: "mypassword"
   MONGO_DBNAME: "playground"
+
+  REDIS_ENABLED: "false"
+  REDIS_HOST: "localhost"
+  REDIS_PORT: "6379"
+  REDIS_PASS: "mypassword"
+  REDIS_DB_NUM: "0"
+
+  SHORT_SHA: "12345678"
+  GIT_TAG: "v1.0.0"

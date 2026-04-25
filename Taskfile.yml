@@ -39,6 +39,7 @@ tasks:
     ignore_error: true
     silent: true
     cmds:
+      - task: tilt:clean
       - task: kind:clean
       # - task: compose:clean
       - task: docker-engine:clean
@@ -171,36 +172,53 @@ tasks:
     cmds:
       - task: kind:cloud-provider:run
 
-  kind:print:
-    silent: true
+  # kind:print:
+  #   silent: true
+  #   cmds:
+  #     - |
+  #       {{range .CLUSTERS | splitArgs}}
+  #         # echo "{{.}}"
+  #         cat "{{.}}" | yq .name
+  #       {{end}}
+
+  kind:setup:
+    deps:
+      - docker-engine:start
     cmds:
-      - |
-        {{range .CLUSTERS | splitArgs}}
-          # echo "{{.}}"
-          cat "{{.}}" | yq .name
-        {{end}}
+      - ./kind/local-registry-setup.sh
 
   kind:create:
     silent: true
     deps:
       - docker-engine:start
+      - kind:setup
     cmds:
-      - |
-        {{range .CLUSTERS | splitArgs}}
-          cluster_name=$(yq '.name' {{.}})
-          if ! kubectl cluster-info --context kind-${cluster_name} > /dev/null 2>&1
-          then
-            kind create cluster --config={{.}}
-          else
-            echo "$cluster_name already created"
-          fi
-        {{end}}
+      - kind create cluster --config=kind/slke-1.yaml
+      - ./kind/local-registry-finish.sh
     status:
-      - |
-        {{range .CLUSTERS | splitArgs}}
-          cluster_name=$(yq '.name' {{.}})
-          kubectl cluster-info --context kind-${cluster_name}
-        {{end}}
+      - kubectl cluster-info --context kind-slke-1
+
+  # kind:create:
+  #   silent: true
+  #   deps:
+  #     - docker-engine:start
+  #   cmds:
+  #     - |
+  #       {{range .CLUSTERS | splitArgs}}
+  #         cluster_name=$(yq '.name' {{.}})
+  #         if ! kubectl cluster-info --context kind-${cluster_name} > /dev/null 2>&1
+  #         then
+  #           kind create cluster --config={{.}}
+  #         else
+  #           echo "$cluster_name already created"
+  #         fi
+  #       {{end}}
+  #   status:
+  #     - |
+  #       {{range .CLUSTERS | splitArgs}}
+  #         cluster_name=$(yq '.name' {{.}})
+  #         kubectl cluster-info --context kind-${cluster_name}
+  #       {{end}}
 
   kind:clean:
     silent: true
@@ -267,11 +285,11 @@ tasks:
       - infra:istio:install
       - infra:metrics-server:install
       - infra:kube-prom-stack:install
-      - infra:headlamp:install
+      #- infra:headlamp:install
       - infra:homer:install
-      - infra:grafana:install
+      #- infra:grafana:install
       - infra:argo-rollouts:install
-      - infra:kiali:install
+      #- infra:kiali:install
 
   infra:clean:
     deps:
@@ -608,7 +626,8 @@ tasks:
   # INFRA END
 
   # APP START
-  app:
+  tilt:
+    aliases: ["app"]
     deps:
       - infra
     preconditions:
@@ -622,7 +641,7 @@ tasks:
         vars: { CRD: "virtualservices.networking.istio.io" }
       - tilt ci
 
-  app:clean:
+  tilt:clean:
     cmds:
       - tilt down
   # APP END

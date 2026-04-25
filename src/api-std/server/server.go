@@ -25,10 +25,22 @@ func Init() {
 	apiMux.HandleFunc("/", http.HandlerFunc(handlers.GenericNotFoundHandler))
 	apiMux.Handle("GET /env", loggingMiddleware(http.HandlerFunc(v1.EnvHandler)))
 	apiMux.Handle("GET /health/simple", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))
-	apiMux.Handle("GET /health/postgres", loggingMiddleware(http.HandlerFunc(health.PostgresHealthHandler)))
-	apiMux.Handle("GET /health/mysql", loggingMiddleware(http.HandlerFunc(health.MYSQLHealthHandler)))
-	apiMux.Handle("GET /health/mongo", loggingMiddleware(http.HandlerFunc(health.MongoHealthHandler)))
-	apiMux.Handle("GET /health/redis", loggingMiddleware(http.HandlerFunc(health.RedisHealthHandler)))
+
+	if config.Env.MySQLEnabled {
+		apiMux.Handle("GET /health/mysql", loggingMiddleware(http.HandlerFunc(health.MYSQLHealthHandler)))
+	}
+
+	if config.Env.PostgresEnabled {
+		apiMux.Handle("GET /health/postgres", loggingMiddleware(http.HandlerFunc(health.PostgresHealthHandler)))
+	}
+
+	if config.Env.MongoEnabled {
+		apiMux.Handle("GET /health/mongo", loggingMiddleware(http.HandlerFunc(health.MongoHealthHandler)))
+	}
+
+	if config.Env.RedisEnabled {
+		apiMux.Handle("GET /health/redis", loggingMiddleware(http.HandlerFunc(health.RedisHealthHandler)))
+	}
 
 	// todo
 	apiMux.Handle("GET /health/intergrations", loggingMiddleware(http.HandlerFunc(health.BasicHealthHandler)))

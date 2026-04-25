@@ -2,22 +2,26 @@
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: slke-1
-kubeadmConfigPatches:
+# kubeadmConfigPatches:
+#   - |-
+#     kind: ClusterConfiguration
+#     controllerManager:
+#       extraArgs:
+#         bind-address: 0.0.0.0
+#     etcd:
+#       local:
+#         extraArgs:
+#           listen-metrics-urls: http://0.0.0.0:2381
+#     scheduler:
+#       extraArgs:
+#         bind-address: 0.0.0.0
+#   - |-
+#     kind: KubeProxyConfiguration
+#     metricsBindAddress: 0.0.0.0
+containerdConfigPatches:
   - |-
-    kind: ClusterConfiguration
-    controllerManager:
-      extraArgs:
-        bind-address: 0.0.0.0
-    etcd:
-      local:
-        extraArgs:
-          listen-metrics-urls: http://0.0.0.0:2381
-    scheduler:
-      extraArgs:
-        bind-address: 0.0.0.0
-  - |-
-    kind: KubeProxyConfiguration
-    metricsBindAddress: 0.0.0.0
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"
 nodes:
   - role: control-plane
     image: kindest/node:v1.35.1

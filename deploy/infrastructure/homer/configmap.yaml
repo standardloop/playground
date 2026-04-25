@@ -176,3 +176,11 @@ data:
             # endpoint: "http://localhost:8080"
             type: "Ping"
             target: "_blank" # optional html tag target attribute
+          - name: "API"
+            icon: "fas fa-rocket"
+            subtitle: "WIP"
+            tag: "app"
+            keywords: "API"
+            url: "http://api.playground.local/v1/health/simple"
+            type: "Ping"
+            target: "_blank" # optional html tag target attribute

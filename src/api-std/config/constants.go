@@ -1,5 +1,5 @@
 package config
 
 const (
-	ApiVersion = "/api/v1"
+	ApiVersion = "/v1"
 )
