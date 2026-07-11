@@ -274,27 +274,12 @@ tasks:
 
   # INFRA START
   infra:
-    aliases: [infrastructure]
     deps:
-      - infra:istio:install
-      - infra:metrics-server:install
-      - infra:kube-prom-stack:install
-      # - infra:headlamp:install
-      - infra:homer:install
-      - infra:grafana:install
-      - infra:argo-rollouts:install
-      # - infra:kiali:install
-
-  infra:clean:
-    deps:
-      - task: infra:metrics-server:clean
-      - task: infra:istio:clean
-      - task: infra:kube-prom-stack:clean
-      - task: infra:argo-rollouts:clean
-      - task: infra:headlamp:clean
-      - task: infra:homer:clean
-      - task: infra:grafana:clean
-      - task: infra:kiali:clean
+      - kind:cloud-provider:run
+    cmds:
+      - tofu init --upgrade
+      - tofu apply --auto-approve
+  # INFRA END
 
   ## ISTIO START
 
@@ -320,53 +305,6 @@ tasks:
 
   ## ISTIO END
 
-  ## KIALI START
-  infra:kiali:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - task: infra:kiali:operator:install
-      - task: infra:kiali:instance:install
-
-  infra:kiali:operator:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/kiali/operator
-    status:
-      - kubectl diff -k deploy/infrastructure/kiali/operator
-
-  infra:kiali:operator:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/kiali/operator
-
-  infra:kiali:instance:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:kiali:operator:install
-      - task: wait-for-crd
-        vars: { CRD: "kialis.kiali.io" }
-    cmds:
-      - kubectl apply -k deploy/infrastructure/kiali/instance
-    status:
-      - kubectl diff -k deploy/infrastructure/kiali/instance
-
-  infra:kiali:instance:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/kiali/instance
-
-  infra:kiali:clean:
-    cmds:
-      - task: infra:kiali:instance:clean
-      - task: infra:kiali:operator:clean
-
-
-  ## KIALI END
-
-
   ## HEADLAMP START
   infra:headlamp:install:
     deps:
@@ -390,98 +328,6 @@ tasks:
       - kubectl delete -k deploy/infrastructure/headlamp
   ## HEADLAMP END
 
-  ## GRAFANA START
-  infra:grafana:install:
-    cmds:
-      - task: infra:grafana:operator:install
-      - task: infra:grafana:instance:install
-      - task: infra:grafana:dashboards:install
-
-  infra:grafana:clean:
-    cmds:
-      - task: infra:grafana:dashboards:clean
-      - task: infra:grafana:instance:clean
-      - task: infra:grafana:operator:clean
-
-  ### GRAFANA OPERATOR START
-  infra:grafana:operator:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/grafana/operator
-    status:
-      - kubectl diff -k deploy/infrastructure/grafana/operator
-
-  infra:grafana:operator:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/grafana/operator
-  ### GRAFANA INSTANCE START
-  infra:grafana:instance:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:grafana:operator:install
-      - task: wait-for-crd
-        vars: { CRD: "grafanas.grafana.integreatly.org" }
-      - task: wait-for-crd
-        vars: { CRD: "grafanadatasources.grafana.integreatly.org" }
-    cmds:
-      - kubectl apply -k deploy/infrastructure/grafana/instance
-    status:
-      - kubectl diff -k deploy/infrastructure/grafana/instance
-
-  infra:grafana:instance:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/grafana/instance
-  ### GRAFANA INSTANCE END
-  ### GRAFANA DASHBOARDS START
-  infra:grafana:dashboards:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:grafana:operator:install
-      - task: wait-for-crd
-        vars: { CRD: "grafanadashboards.grafana.integreatly.org" }
-    vars:
-      NAMESPACE: grafana
-    cmds:
-      - |
-        helm upgrade --install grafana-dashboards deploy/infrastructure/grafana/dashboards \
-          -f deploy/infrastructure/grafana/dashboards/values.yaml \
-          -f deploy/infrastructure/grafana/dashboards/env/playground.values.yaml \
-          --namespace {{.NAMESPACE}}
-    status:
-      - |
-        helm template deploy/infrastructure/grafana/dashboards --name-template=grafana-dashboards \
-          --namespace {{.NAMESPACE}} \
-          --is-upgrade \
-          --no-hooks \
-          -f deploy/infrastructure/grafana/dashboards/values.yaml \
-          -f deploy/infrastructure/grafana/dashboards/env/playground.values.yaml | kubectl diff -f - -n {{.NAMESPACE}}
-
-  infra:grafana:dashboards:clean:
-    cmds:
-      - helm delete grafana-dashboards -n grafana
-  ### GRAFANA DASHBOARDS END
-  ## GRAFANA END
-
-  ## HOMER START
-  infra:homer:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/homer
-      - open "http://home.playground.local"
-    status:
-      - kubectl diff -k deploy/infrastructure/homer
-
-  infra:homer:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/homer
-  ## HOMER END
-
   # INFRA END
 
   # APP START
@@ -504,8 +350,3 @@ tasks:
     cmds:
       - tilt down
   # APP END
-
-  tofu:
-    cmds:
-      - tofu init --upgrade
-      - tofu apply --auto-approve
