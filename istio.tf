@@ -1,3 +1,7 @@
+/*
+  WIP: note about /etc/hosts
+*/
+
 // base
 data "kustomization_build" "istio_base" {
   path = "deploy/infrastructure/istio/base"
