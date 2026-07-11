@@ -1,4 +1,9 @@
 # playground
+
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=fff)](#)
+
+https://github.com/standardloop/playground
+
 This repo contains various tools and software to play around with.
 
 ## Tools Used
