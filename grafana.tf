@@ -19,8 +19,8 @@ resource "null_resource" "wait_for_grafana_operator" {
 
 // instance
 module "wait_for_crds_needed_for_grafana_instance" {
-    depends_on = [ null_resource.wait_for_grafana_operator ]
-  source = "./modules/wait-for-crd"
+  depends_on = [null_resource.wait_for_grafana_operator]
+  source     = "./modules/wait-for-crd"
   crds = [
     "grafanas.grafana.integreatly.org",
     "grafanadatasources.grafana.integreatly.org"
@@ -39,8 +39,8 @@ resource "kustomization_resource" "grafana_instance" {
 
 // dashboards
 module "wait_for_crds_needed_for_grafana_dashboards" {
-    depends_on = [ null_resource.wait_for_grafana_operator ]
-  source = "./modules/wait-for-crd"
+  depends_on = [null_resource.wait_for_grafana_operator]
+  source     = "./modules/wait-for-crd"
   crds = [
     "grafanadashboards.grafana.integreatly.org",
   ]
