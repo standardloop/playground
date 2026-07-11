@@ -4,7 +4,7 @@
 
 https://github.com/standardloop/playground
 
-This repo contains various tools and software to play around with.
+Playground is a local environment for playing around with various kubernetes tools.
 
 ## Tools Used
 
