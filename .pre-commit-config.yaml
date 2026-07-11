@@ -15,12 +15,15 @@ repos:
       - id: helm-schema
         args:
           - --helm-docs-compatibility-mode
-  # todu
+  - repo: https://github.com/tofuutils/pre-commit-opentofu
+    rev: v2.4.2
+    hooks:
+      - id: tofu_fmt
   - repo: https://github.com/terraform-docs/terraform-docs
     rev: "v0.24.0"
     hooks:
       - id: terraform-docs-go
-        args: ["--output-file", "README.md", "./modules/wait-for-crd"]
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/wait-for-crd"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:

@@ -9,6 +9,6 @@ variable "timeout" {
 }
 
 variable "attempts" {
-  type = number
+  type    = number
   default = 30
 }
