@@ -243,6 +243,7 @@ tasks:
 
   # INFRA START
   infra:
+    aliases: [infrastructure]
     deps:
       - infra:create
 

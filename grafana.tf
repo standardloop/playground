@@ -13,7 +13,7 @@ resource "null_resource" "wait_for_grafana_operator" {
   depends_on = [kustomization_resource.grafana_operator]
 
   provisioner "local-exec" {
-    command = "kubectl wait helmrelease/grafana-operator --for=condition=Ready --timeout=180s -n grafana"
+    command = "kubectl wait helmrelease/grafana-operator --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n grafana"
   }
 }
 

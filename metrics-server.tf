@@ -12,6 +12,6 @@ resource "null_resource" "wait_for_metrics_server" {
   depends_on = [kustomization_resource.metrics_server]
 
   provisioner "local-exec" {
-    command = "kubectl wait helmrelease/metrics-server --for=condition=Ready --timeout=180s -n kube-system"
+    command = "kubectl wait helmrelease/metrics-server --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n kube-system"
   }
 }

@@ -14,6 +14,6 @@ resource "null_resource" "wait_for_argo_rollouts" {
   depends_on = [kustomization_resource.argo_rollouts]
 
   provisioner "local-exec" {
-    command = "kubectl wait helmrelease/argo-rollouts --for=condition=Ready --timeout=180s -n argo-rollouts"
+    command = "kubectl wait helmrelease/argo-rollouts --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n argo-rollouts"
   }
 }

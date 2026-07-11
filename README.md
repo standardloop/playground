@@ -12,6 +12,7 @@ Playground is a local environment for playing around with various kubernetes too
 - [task (go-task)](https://github.com/go-task/task) for the overall automation.
 - [rancher-desktop](https://github.com/rancher-sandbox/rancher-desktop/) or [colima](https://github.com/abiosoft/colima) for handling docker engine.
 - [kind](https://github.com/kubernetes-sigs/kind) for provisioning a local kubernetes cluster.
+    - [local registry](https://kind.sigs.k8s.io/docs/user/local-registry/) is enabled on the cluster.
 - [cloud-provider-kind](https://github.com/kubernetes-sigs/cloud-provider-kind) for the ability to have access to `gatewayClassName: cloud-provider-kind`.
 - [opentofu](https://github.com/opentofu/opentofu) for deploying infrastructure applications.
     - [kustomize provider](https://github.com/kbst/terraform-provider-kustomization) for deploying [kustomizations](https://github.com/kubernetes-sigs/kustomize).
@@ -38,7 +39,7 @@ Playground is a local environment for playing around with various kubernetes too
 - [yamllint](https://github.com/adrienverge/yamllint) for enforcing yaml rules.
 - [helm-docs](https://github.com/norwoodj/helm-docs) for managing helm documentation.
 - [helm-schema](https://github.com/dadav/helm-schema) for handling helm `values.schema.json` generation.
-- [terraform-docs](https://github.com/terraform-docs/terraform-docs) for handling terraform documentation.
+- [terraform-docs](https://github.com/terraform-docs/terraform-docs) for handling tofu documentation.
 
 ## Screenshot
 

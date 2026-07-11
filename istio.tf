@@ -75,7 +75,7 @@ resource "null_resource" "wait_for_istio_gateway" {
 #   depends_on = [kustomization_resource.kiali_operator]
 
 #   provisioner "local-exec" {
-#     command = "kubectl wait helmrelease/kiali-operator --for=condition=Ready --timeout=180s -n kiali-operator"
+#     command = "kubectl wait helmrelease/kiali-operator --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n kiali-operator"
 #   }
 # }
 

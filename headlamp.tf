@@ -19,6 +19,6 @@
 #   depends_on = [kustomization_resource.headlamp]
 
 #   provisioner "local-exec" {
-#     command = "kubectl wait helmrelease/headlamp --for=condition=Ready --timeout=180s -n kube-system"
+#     command = "kubectl wait helmrelease/headlamp --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n kube-system"
 #   }
 # }

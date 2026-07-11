@@ -13,7 +13,7 @@ resource "null_resource" "wait_for_prometheus" {
   depends_on = [kustomization_resource.prometheus]
 
   provisioner "local-exec" {
-    command = "kubectl wait helmrelease/kube-prometheus-stack --for=condition=Ready --timeout=180s -n kube-prometheus-stack"
+    command = "kubectl wait helmrelease/kube-prometheus-stack --for=condition=Ready --timeout=${var.HELM_RELEASE_TIMEOUT} -n kube-prometheus-stack"
   }
 }
 
