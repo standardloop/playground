@@ -42,7 +42,7 @@ This repo contains various tools and software to play around with.
 
 ## Screenshot
 
-![alt text](docs/screenshot.png)
+![alt text](https://raw.githubusercontent.com/standardloop/playground/refs/heads/main/docs/screenshot.png)
 
 
 ## Spin Up
