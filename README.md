@@ -2,6 +2,8 @@
 
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=fff)](#)
 
+---
+
 https://github.com/standardloop/playground
 
 Playground is a local environment for playing around with various kubernetes tools.
