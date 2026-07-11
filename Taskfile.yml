@@ -32,7 +32,7 @@ tasks:
 
   pre-commit:
     cmds:
-      - pre-commit run --all
+      - prek run --all-files
 
   clean:
     aliases: [delete]
@@ -281,7 +281,7 @@ tasks:
       - infra:kube-prom-stack:install
       # - infra:headlamp:install
       - infra:homer:install
-      # - infra:grafana:install
+      - infra:grafana:install
       - infra:argo-rollouts:install
       # - infra:kiali:install
 
@@ -296,90 +296,7 @@ tasks:
       - task: infra:grafana:clean
       - task: infra:kiali:clean
 
-  ## FLUX START
-  infra:flux:install:
-    deps:
-      - kind
-    cmds:
-      - flux install --components=source-controller,helm-controller
-    status:
-      - |
-        flux check --components=source-controller,helm-controller
-
-  infra:flux:clean:
-    aliases: [infra:flux:uninstall, infra:flux:delete]
-    interactive: true
-    cmds:
-      - flux uninstall
-  ## FLUX END
-
-  ## SOURCES START
-  infra:sources:install:
-    deps:
-      - infra:flux:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/sources
-    status:
-      - kubectl diff -k deploy/infrastructure/sources
-   ## SOURCES END
-
-  ## METRICS_SERVER START
-  infra:metrics-server:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/metrics-server
-    status:
-      - kubectl diff -k deploy/infrastructure/metrics-server
-
-  infra:metrics-server:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/metrics-server
-  ## METRICS_SERVER END
-
   ## ISTIO START
-  infra:istio:install:
-    deps:
-      - infra:sources:install
-    cmds:
-      - task: infra:istio:base:install
-      - task: infra:istio:gateway:install
-      # - task: infra:istio:update-etc-hosts
-
-  infra:istio:base:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/istio/base
-      - kubectl wait helmrelease/istio-base --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}} -n istio-system
-      - kubectl wait helmrelease/istiod --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-system
-    status:
-      - kubectl diff -k deploy/infrastructure/istio/base
-
-  infra:istio:gateway:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:istio:base:install
-      - task: wait-for-crd
-        vars: { CRD: "gateways.gateway.networking.k8s.io" }
-      - task: wait-for-crd
-        vars: { CRD: "gatewayclasses.gateway.networking.k8s.io" }
-      - task: wait-for-crd
-        vars: { CRD: "httproutes.gateway.networking.k8s.io" }
-      - task: wait-for-crd
-        vars: { CRD: "gateways.networking.istio.io" }
-      - task: wait-for-crd
-        vars: { CRD: "envoyfilters.networking.istio.io" }
-      - task: wait-for-crd
-        vars: { CRD: "virtualservices.networking.istio.io" }
-    cmds:
-      - kubectl apply -k deploy/infrastructure/istio/gateway
-      - kubectl wait helmrelease/istio-gateway --for=condition=Ready --timeout={{.HELM_RELEASE_TIMEOUT}}  -n istio-gateway
-    status:
-      - kubectl diff -k deploy/infrastructure/istio/gateway
 
   infra:istio:update-etc-hosts:
     prompt: Do you want to update /etc/hosts ?
@@ -449,43 +366,6 @@ tasks:
 
   ## KIALI END
 
-  ## KUBE_PROM_STACK START
-  infra:kube-prom-stack:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - task: infra:kube-prom-stack:chart:install
-      - task: infra:kube-prom-stack:scrapers:install
-
-  infra:kube-prom-stack:chart:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/kube-prom-stack
-    status:
-      - kubectl diff -k deploy/infrastructure/kube-prom-stack
-
-  infra:kube-prom-stack:scrapers:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-      - infra:kube-prom-stack:chart:install
-      - task: wait-for-crd
-        vars: { CRD: "podmonitors.monitoring.coreos.com" }
-      - task: wait-for-crd
-        vars: { CRD: "servicemonitors.monitoring.coreos.com" }
-    cmds:
-      - kubectl apply -k deploy/infrastructure/kube-prom-stack/scrapers
-    status:
-      - kubectl diff -k deploy/infrastructure/kube-prom-stack/scrapers
-
-  infra:kube-prom-stack:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/kube-prom-stack/scrapers
-      - kubectl delete -k deploy/infrastructure/kube-prom-stack
-  ## KUBE_PROM_STACK END
 
   ## ARGO_ROLLOUTS START
   infra:argo-rollouts:install:
@@ -639,3 +519,8 @@ tasks:
     cmds:
       - tilt down
   # APP END
+
+  tofu:
+    cmds:
+      - tofu init --upgrade
+      - tofu apply --auto-approve
