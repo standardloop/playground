@@ -59,41 +59,41 @@ resource "null_resource" "wait_for_istio_gateway" {
   }
 }
 
-# // kiali
-# //// operator
-# data "kustomization_build" "kiali_operator" {
-#   path = "deploy/infrastructure/kiali/operator"
-# }
+// kiali
+//// operator
+data "kustomization_build" "kiali_operator" {
+  path = "deploy/infrastructure/kiali/operator"
+}
 
-# resource "kustomization_resource" "kiali_operator" {
-#   for_each   = data.kustomization_build.kiali_operator.ids
-#   manifest   = data.kustomization_build.kiali_operator.manifests[each.value]
-#   depends_on = [helm_release.flux2, kustomization_resource.flux_sources]
-# }
+resource "kustomization_resource" "kiali_operator" {
+  for_each   = data.kustomization_build.kiali_operator.ids
+  manifest   = data.kustomization_build.kiali_operator.manifests[each.value]
+  depends_on = [helm_release.flux2, kustomization_resource.flux_sources]
+}
 
-# resource "null_resource" "wait_for_kiali_operator" {
-#   depends_on = [kustomization_resource.kiali_operator]
+resource "null_resource" "wait_for_kiali_operator" {
+  depends_on = [kustomization_resource.kiali_operator]
 
-#   provisioner "local-exec" {
-#     command = "kubectl wait helmrelease/kiali-operator --for=condition=Ready --timeout=180s -n kiali-operator"
-#   }
-# }
+  provisioner "local-exec" {
+    command = "kubectl wait helmrelease/kiali-operator --for=condition=Ready --timeout=180s -n kiali-operator"
+  }
+}
 
-# // instance
-# module "wait_for_crds_needed_for_kiali_instance" {
-#   depends_on = [null_resource.wait_for_kiali_operator]
-#   source     = "./modules/wait-for-crd"
-#   crds = [
-#     "kialis.kiali.io",
-#   ]
-# }
+// instance
+module "wait_for_crds_needed_for_kiali_instance" {
+  depends_on = [null_resource.wait_for_kiali_operator]
+  source     = "./modules/wait-for-crd"
+  crds = [
+    "kialis.kiali.io",
+  ]
+}
 
-# data "kustomization_build" "kiali_instance" {
-#   path = "deploy/infrastructure/kiali/instance"
-# }
+data "kustomization_build" "kiali_instance" {
+  path = "deploy/infrastructure/kiali/instance"
+}
 
-# resource "kustomization_resource" "kiali_instance" {
-#   depends_on = [module.wait_for_crds_needed_for_kiali_instance]
-#   for_each   = data.kustomization_build.kiali_instance.ids
-#   manifest   = data.kustomization_build.kiali_instance.manifests[each.value]
-# }
+resource "kustomization_resource" "kiali_instance" {
+  depends_on = [module.wait_for_crds_needed_for_kiali_instance]
+  for_each   = data.kustomization_build.kiali_instance.ids
+  manifest   = data.kustomization_build.kiali_instance.manifests[each.value]
+}
