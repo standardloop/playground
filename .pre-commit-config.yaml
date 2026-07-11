@@ -1,11 +1,5 @@
 ---
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-        exclude_types: [json]
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.37.1
     hooks:
@@ -21,3 +15,15 @@ repos:
       - id: helm-schema
         args:
           - --helm-docs-compatibility-mode
+  # todu
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.24.0"
+    hooks:
+      - id: terraform-docs-go
+        args: ["--output-file", "README.md", "./modules/wait-for-crd"]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude_types: [json]

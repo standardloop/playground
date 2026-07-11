@@ -1,0 +1,1 @@
+variable "HELM_RELEASE_TIMEOUT" {}
