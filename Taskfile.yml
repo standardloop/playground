@@ -40,6 +40,7 @@ tasks:
     silent: true
     cmds:
       - task: tilt:clean
+      - task: infra:clean
       - task: kind:clean
       # - task: compose:clean
       - task: docker-engine:clean
@@ -160,7 +161,6 @@ tasks:
         echo "{{.TEXT_GREEN}}{{.CRD}} came up!{{.TEXT_RESET}}"
     status:
       - kubectl wait --for condition=established --timeout=60s crd {{.CRD}} > /dev/null 2>&1
-
   # HELPER END
 
   # KIND START
@@ -172,15 +172,6 @@ tasks:
     cmds:
       - task: kind:cloud-provider:run
 
-  # kind:print:
-  #   silent: true
-  #   cmds:
-  #     - |
-  #       {{range .CLUSTERS | splitArgs}}
-  #         # echo "{{.}}"
-  #         cat "{{.}}" | yq .name
-  #       {{end}}
-
   kind:create:
     silent: true
     deps:
@@ -191,28 +182,6 @@ tasks:
       - ./kind/local-registry-finish.sh
     status:
       - kubectl cluster-info --context kind-slke-1
-
-  # kind:create:
-  #   silent: true
-  #   deps:
-  #     - docker-engine:start
-  #   cmds:
-  #     - |
-  #       {{range .CLUSTERS | splitArgs}}
-  #         cluster_name=$(yq '.name' {{.}})
-  #         if ! kubectl cluster-info --context kind-${cluster_name} > /dev/null 2>&1
-  #         then
-  #           kind create cluster --config={{.}}
-  #         else
-  #           echo "$cluster_name already created"
-  #         fi
-  #       {{end}}
-  #   status:
-  #     - |
-  #       {{range .CLUSTERS | splitArgs}}
-  #         cluster_name=$(yq '.name' {{.}})
-  #         kubectl cluster-info --context kind-${cluster_name}
-  #       {{end}}
 
   kind:clean:
     silent: true
@@ -275,59 +244,18 @@ tasks:
   # INFRA START
   infra:
     deps:
+      - infra:create
+
+  infra:create:
+    deps:
       - kind:cloud-provider:run
     cmds:
       - tofu init --upgrade
       - tofu apply --auto-approve
-  # INFRA END
 
-  ## ISTIO START
-
-  infra:istio:update-etc-hosts:
-    prompt: Do you want to update /etc/hosts ?
-    silent: true
-    deps:
-      - infra:istio:install
+  infra:clean:
     cmds:
-      - |
-        if [[ -n "{{.LOAD_BALANCER_IP}}" ]]; then
-          echo {{.LOAD_BALANCER_IP}}
-          sudo -v
-          echo "{{.LOAD_BALANCER_IP}}      playground.local" | sudo tee -a /etc/hosts
-        else
-          echo "{{.TEXT_RED}}Couldn't find IP address{{.TEXT_RESET}}"
-        fi
-    status:
-      - cat /etc/hosts | grep {{.LOAD_BALANCER_IP}}
-    vars:
-      LOAD_BALANCER_IP:
-        sh: kubectl get gateway/playground-local-gateway -n istio-gateway | awk '{print $3}' | awk NR==2  # yamllint disable-line rule:line-length
-
-  ## ISTIO END
-
-  ## HEADLAMP START
-  infra:headlamp:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/headlamp
-      # - kubectl -n kube-system create serviceaccount headlamp-admin  # wip
-    status:
-      - kubectl diff -k deploy/infrastructure/headlamp
-
-  infra:headlamp:token:
-    deps:
-      - infra:headlamp:install
-    cmds:
-      - kubectl create clusterrolebinding headlamp-playground-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
-      - kubectl create token headlamp-admin -n kube-system | pbcopy
-
-  infra:headlamp:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/headlamp
-  ## HEADLAMP END
-
+      - tofu destroy --auto-approve
   # INFRA END
 
   # APP START
