@@ -23,7 +23,7 @@ repos:
     rev: "v0.24.0"
     hooks:
       - id: terraform-docs-go
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/wait-for-crd"]
+        args: ["./modules/wait-for-crd"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
