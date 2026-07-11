@@ -367,21 +367,6 @@ tasks:
   ## KIALI END
 
 
-  ## ARGO_ROLLOUTS START
-  infra:argo-rollouts:install:
-    deps:
-      - infra:flux:install
-      - infra:sources:install
-    cmds:
-      - kubectl apply -k deploy/infrastructure/argo-rollouts
-    status:
-      - kubectl diff -k deploy/infrastructure/argo-rollouts
-
-  infra:argo-rollouts:clean:
-    cmds:
-      - kubectl delete -k deploy/infrastructure/argo-rollouts
-  ## ARGO_ROLLOUTS END
-
   ## HEADLAMP START
   infra:headlamp:install:
     deps:
