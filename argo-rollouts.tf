@@ -5,8 +5,8 @@ data "kustomization_build" "argo_rollouts" {
 resource "kustomization_resource" "argo_rollouts" {
   depends_on = [helm_release.flux2, kustomization_resource.flux_sources]
 
-  for_each = data.kustomization_build.metrics_server.ids
-  manifest = data.kustomization_build.metrics_server.manifests[each.value]
+  for_each = data.kustomization_build.argo_rollouts.ids
+  manifest = data.kustomization_build.argo_rollouts.manifests[each.value]
 
 }
 

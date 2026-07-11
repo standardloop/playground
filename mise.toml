@@ -8,9 +8,12 @@ kind = "latest"
 colima = "latest"
 rancher = "latest"
 
-kubectl = "latest"
-helm = "latest"
-tilt = "latest"
-flux2 = "latest"
+# kubectl = "latest"
+# helm = "latest"
+# flux2 = "latest"
+# terraform-docs = "latest"
+
+
 opentofu = "latest"
-terraform-docs = "latest"
+prek = "latest"
+tilt = "latest"
