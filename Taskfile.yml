@@ -253,6 +253,8 @@ tasks:
       - tofu init --upgrade
       - tofu apply --auto-approve
 
+  home: open "http://home.playground.local"
+
   infra:clean:
     cmds:
       - tofu destroy --auto-approve
