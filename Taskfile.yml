@@ -30,9 +30,9 @@ tasks:
     cmds:
       - task: app
 
-  pre-commit:
-    cmds:
-      - prek run --all-files
+  pre-commit: prek run --all-files
+
+  pre-commit:update: prek update
 
   clean:
     aliases: [delete]
