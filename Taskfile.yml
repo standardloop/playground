@@ -30,6 +30,16 @@ tasks:
     cmds:
       - task: app
 
+  mise:
+    cmds:
+      - mise activate
+      - mise install
+
+  mise:clean:
+    cmds:
+      - mise uninstall --all
+      - mise deactivate
+
   pre-commit: prek run --all-files
 
   pre-commit:update: prek update

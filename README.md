@@ -54,10 +54,41 @@ Playground is a local environment for playing around with various kubernetes too
 $ task
 ```
 
+Note: `sudo` is needed to run `cloud-provider-kind`.
+
 ## Clean Up
 
 ```sh
 $ task clean
+```
+
+## Updating `/etc/hosts`
+
+You will need to update your `/etc/hosts` to have access to the applications on the local cluster.
+
+### Find you IP
+
+```sh
+$ kubectl get gateway playground-local-gateway  -n istio-gateway
+NAME                       CLASS                 ADDRESS      PROGRAMMED   AGE
+playground-local-gateway   cloud-provider-kind   172.18.0.5   True         17m
+```
+
+### `/etc/hosts` example
+
+```sh
+$ cat /etc/hosts`
+172.18.0.5      playground.local
+172.18.0.5      grafana.playground.local
+172.18.0.5      prometheus.playground.local
+172.18.0.5      api.playground.local
+172.18.0.5      www.playground.local
+172.18.0.5      rollouts.playground.local
+172.18.0.5      api.playground.local
+172.18.0.5      headlamp.playground.local
+172.18.0.5      homer.playground.local
+172.18.0.5      home.playground.local
+172.18.0.5      kiali.playground.local
 ```
 
 ## Mise WIP
